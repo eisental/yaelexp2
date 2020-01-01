@@ -23,7 +23,6 @@ export class AudioController extends React.Component {
   }
 
   componentDidMount() {
-    console.log(this.player);
     for (let i=0; i<this.srcs.length; i++) {
       let p = this.players[i].current;
       p.src = this.srcs[i];
