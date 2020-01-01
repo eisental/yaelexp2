@@ -7,6 +7,7 @@ export class AudioController extends React.Component {
     this.players = props.srcs.map(s => React.createRef());
     this.loadCount = 0;
     this.onDoneLoading = props.onDoneLoading;
+    this.onAudioEnded = props.onAudioEnded;
   }
 
   audioLoaded(player) {
@@ -27,6 +28,7 @@ export class AudioController extends React.Component {
       let p = this.players[i].current;
       p.src = this.srcs[i];
       p.addEventListener('canplaythrough', (e => {this.audioLoaded(p)}), false);
+      p.addEventListener('ended', (e => {if (this.onAudioEnded) this.onAudioEnded(i)}), false);
     }      
   }
 

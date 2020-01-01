@@ -25,6 +25,7 @@ export class LessonBlock extends React.Component {
         <AudioController 
           srcs={srcs} id="audio" 
           onDoneLoading={() => console.log("finished loading audio sources.")}
+          onAudioEnded={(i) => console.log("finished playing audio " + i)}
           ref={this.audioController} />
       </div>
     );
