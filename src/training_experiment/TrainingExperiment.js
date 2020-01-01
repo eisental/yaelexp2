@@ -4,6 +4,7 @@ import { Container } from 'semantic-ui-react';
 import { IntroText, InfoText } from './info.js';
 import { LessonType, Strings } from './defs.js';
 import { LessonBlock } from './lesson_block.js';
+import { TrainingBlock } from './training_block.js';
 
 // 1st screen.
 function IntroScreen({next, data}) {
@@ -31,10 +32,17 @@ function InfoScreen({next, lesson_type}) {
   );
 }
 
+function FinishScreen({data}) {
+  return (<div>
+          Finish text goes here<br/>
+          data = {data.id}
+          </div>);
+}
+
 class TrainingExperiment extends React.Component {
   state = {
     step: 1,
-    lesson_type: LessonType.AUTOMATIC
+    lesson_type: LessonType.MUSICAL_PIECES
   };
 
   data = {
@@ -60,8 +68,13 @@ class TrainingExperiment extends React.Component {
       screen = <InfoScreen next={this.nextStep} lesson_type={this.state.lesson_type} />;
       break;
     case 3:
-      screen = <LessonBlock data={this.data} next={this.nextStep} state={this.state.lesson_type} />;
+      screen = <LessonBlock data={this.data} next={this.nextStep} lesson_type={this.state.lesson_type} />;
       break;
+    case 4:
+      screen = <TrainingBlock data={this.data} next={this.nextStep} lesson_type={this.state.lesson_type} />;
+      break;
+    case 5:
+      screen = <FinishScreen data={this.data} />;
     }
     return (
         <Container textAlign='center' className="App">
