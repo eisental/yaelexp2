@@ -3,22 +3,35 @@ import React from 'react';
 export class AudioController extends React.Component {
   constructor(props) {
     super(props);
-    this.player = React.createRef();
-    this.src = props.src;
+    this.srcs = props.srcs;
+    this.players = props.srcs.map(s => React.createRef());
+    this.loadCount = 0;
+    this.onDoneLoading = props.onDoneLoading;
   }
 
   audioLoaded(player) {
-    console.log("loaded audio:" + player.current.src);
+    console.log("loaded audio:" + player.src);
+    this.loadCount+=1;
+    if (this.loadCount === this.srcs.length) {
+      if (this.onDoneLoading) this.onDoneLoading();
+    }
+  }
+
+  play(playerIdx) {
+    console.log("playing " + playerIdx);
+    this.players[playerIdx].current.play();
   }
 
   componentDidMount() {
     console.log(this.player);
-    let player = this.player.current;
-    player.src = this.src;
-    player.addEventListener('canplaythrough', (e => {this.audioLoaded(this.player)}), false);
+    for (let i=0; i<this.srcs.length; i++) {
+      let p = this.players[i].current;
+      p.src = this.srcs[i];
+      p.addEventListener('canplaythrough', (e => {this.audioLoaded(p)}), false);
+    }      
   }
 
   render() {
-    return <audio ref={this.player} />;
+    return this.players.map((p, i) => <audio ref={p} key={i}/>);
   }
 }

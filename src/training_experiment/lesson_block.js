@@ -8,17 +8,24 @@ export class LessonBlock extends React.Component {
     this.data = data;
     this.lesson_type = lesson_type;
     this.next = next;
+    this.audioController = React.createRef();
+  }
+
+  componentDidMount() {
+    this.audioController.current.play(2);
   }
 
   render() {
+    let srcs = [0,1,2,3].map(i => "/audio/" + (i+1) + ".mp3");
+
     return (
       <div>
         <img className="song_image" src="/song_images/song1.jpg" />
-        <AudioController src="/audio/1.mp3" id="audio1" />
-        <AudioController src="/audio/2.mp3" id="audio2" />
-        <AudioController src="/audio/3.mp3" id="audio3" />
-        <AudioController src="/audio/4.mp3" id="audio4" />
         LessonBlock type={this.lesson_type}
+        <AudioController 
+          srcs={srcs} id="audio" 
+          onDoneLoading={() => console.log("finished loading audio sources.")}
+          ref={this.audioController} />
       </div>
     );
   }
