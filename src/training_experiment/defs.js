@@ -6,4 +6,5 @@ export const LessonType = {
 
 export const Strings = {
   continue_text: "הבא",
+  success_identification: "בחרת באקורד הנכון",
 };
