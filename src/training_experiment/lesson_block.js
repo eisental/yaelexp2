@@ -1,14 +1,13 @@
 import React from 'react';
-import { LessonType, Strings } from './defs.js'
+import { LessonType, Strings, StaticImages } from './defs.js'
 import { AudioController } from '../audio_controller.js'
 
 const SucessIdentification = () => {
   return (
-    <div className="row">
+    <div className="row successScreenWrapper">
       <div className="col-sm-8 offset-sm-2">
-        <span className="songTitle"> { Strings.success_identification }</span>
-      </div>
-      <div className = "col-sm-2">
+        <span className="songTitle"> { Strings.success_identification } &nbsp;</span>
+        <img src= { StaticImages.happySmiley } width="150px" height="150px"/>
       </div>
     </div>
   );
