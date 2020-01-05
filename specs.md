@@ -32,7 +32,11 @@ TrainingExperiment: run sequence of screens
 
 Data:
 - id
+- session number?
 - session timing (start, end)
+  - `start_time, end_time`
+  - set by: IntroScreen, Finishscreen
+  - each id has many sessions. 
 - for each training screen:
   - recording number
   - chord number (1-96)
@@ -41,6 +45,23 @@ Data:
   - transposition play index
   - selected chord type (same as chord type)
   - is correct?
+
+record:
+
+`id | session_number | start_time | end_time | time | audio_index | chord_number | chord_type | transposition | transposition_play_count | selected_chord_type | correct? |`
+
+sheets id = 1D2s3D13ldvchzueCFWTkvH8kzhNBEMZzizPnjGQnhMY
+https://docs.google.com/spreadsheets/d/1D2s3D13ldvchzueCFWTkvH8kzhNBEMZzizPnjGQnhMY/edit#gid=0
+
+client id = 382407491501-fi14jrsdgdhad1bdauf313bj0ef53530.apps.googleusercontent.com
+client secret = FWZC2Fe7_V89E1fTxP9X_DU0
+API key = AIzaSyC89VDRdrpLqux6qq3QNj7PwJVNFdhK_VQ
+
+https://sheets.googleapis.com/v4/spreadsheets/1D2s3D13ldvchzueCFWTkvH8kzhNBEMZzizPnjGQnhMY?key=AIzaSyC89VDRdrpLqux6qq3QNj7PwJVNFdhK_VQ
+
+OAuth:
+client id = 251201842015-varda10r4nffbeh3bg5jeja31fcoeevo.apps.googleusercontent.com
+client secret = OsAqRE7D9AWCSan9JT9wrm_B
 
 TestExperiment: 
 

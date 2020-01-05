@@ -19,7 +19,7 @@ export class TrainingBlock extends React.Component {
         <AudioController 
           srcs={srcs} id="audio" 
           onDoneLoading={() => console.log("finished loading audio sources.")}
-          onAudioEnded={(i) => console.log("finished playing audio " + i)}
+          onAudioEnded={(i) => this.audioController.current.play((i+1) % srcs.length)}
           ref={this.audioController} />
         <button onClick={(e) => this.audioController.current.play(currentAudio)}>Click</button>
         TrainingBlock type={this.lesson_type}

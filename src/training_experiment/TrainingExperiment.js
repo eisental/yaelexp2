@@ -40,8 +40,13 @@ function FinishScreen({data}) {
 }
 
 class TrainingExperiment extends React.Component {
+  spreadsheetId = '1D2s3D13ldvchzueCFWTkvH8kzhNBEMZzizPnjGQnhMY';
+  apiKey = 'AIzaSyDHFHbGy_GhEt1Q4FW61YYEX2jk3hZcSoQ';
+  writeScriptUrl = 'https://script.google.com/macros/s/AKfycbxv6Uc9VsHlKI6SMe6YmH-MELryrJYvYg-uQnGFhyMF2X7zyC-O/exec'
+  readUrl = "https://sheets.googleapis.com/v4/spreadsheets/" 
+  
   state = {
-    step: 1,
+    step: 4,
     lesson_type: LessonType.MUSICAL_PIECES
   };
 
@@ -55,6 +60,28 @@ class TrainingExperiment extends React.Component {
       step: step + 1
     });
     console.log(this.data);
+  }
+
+  componentDidMount() {
+    // read
+
+        
+    fetch(this.readUrl + this.spreadsheetId + "/values/TrainingExperiment!A2:A1000?key=" + this.apiKey)
+      .then(response => response.json())
+      .then(data => console.log(data));
+
+    // write
+    fetch(this.writeScriptUrl + "?id=1&session_number=2&timestamp=" + Date.now(),
+          {
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            method: "GET",
+            mode: 'no-cors',
+          })
+      .then(function(res){ console.log(res); })
+      .catch(function(res){ console.log("error" + res); });
   }
 
   render() {
