@@ -1,5 +1,5 @@
 import React from 'react';
-import { LessonType, Strings, StaticImages } from './defs.js'
+import { LessonType, Strings, StaticImages, Chords } from './defs.js'
 import { AudioController } from '../audio_controller.js'
 
 const SucessIdentification = () => {
@@ -13,7 +13,61 @@ const SucessIdentification = () => {
   );
 }
 
-const SongHeader = props =>{
+const ShowCorrectAnswer = props => {
+  const { correctChord } = props;
+  return (
+    <div>
+      <div className="row">
+        <div className="col-sm-8 offset-sm-1">
+          <span className="songTitle">{ Strings.failure_song_has_chord } </span>
+          <span className="songTitle">{ correctChord }</span>
+        </div>
+      </div>
+      <div className="row">
+      &nbsp;
+      </div>
+      <div className="row">
+        <div className="col-sm-8 offset-sm-1">
+          <span className="songTitle">{ Strings.how_it_sounds }</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const FailedIdentification = props => {
+  const { shouldShowCorrect } = props;
+  const { correctChord } = props;
+
+  let appendix = <div></div>
+  if (shouldShowCorrect === true){
+    appendix = <ShowCorrectAnswer correctChord={ correctChord } />
+  }
+  return (
+    <div>
+      <div className="row">
+        <div className="col-sm-8 offset-sm-2">
+            <span className="songTitle"> { Strings.failure_identification } &nbsp;</span>
+            <img src= { StaticImages.sadSmiley } width="150px" height="150px"/>
+        </div>
+      </div>
+      <div className="row">
+        <div className="col-sm-8 offset-sm-1">
+          <span className="songTitle">{ Strings.how_it_sounds }</span>
+        </div>
+      </div>
+      <div className="row">
+        <div className="col-sm-8 offset-sm-1">
+          <span className="songTitle">......</span>
+        </div>
+      </div>
+      { appendix }
+    </div>
+  );
+}
+
+// Will also be used in the training
+export const SongHeader = props =>{
   let { songData } = props;
   return (
     <div className="row">
@@ -50,6 +104,30 @@ const SongWithChords = props => {
           <button className="chordBtn">מז'ור קטן</button>
           <button className="chordBtn">מינור גדול</button>
           <button className="chordBtn">מינור קטן</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const SongWithoutChords = props => {
+  let { chordName } = props;
+  let { songData } = props;
+  return(
+    <div>
+      <SongHeader songData={ songData } />
+      <div className="row"><div className="col-sm-12">&nbsp;</div></div>
+      <div className="row"><div className="col-sm-12">&nbsp;</div></div>
+      <div className="row">
+        <span className="col-sm-4 offset-sm-4">
+          <span className="songTitle fixToRight">
+          שם האקורד:
+          </span>
+        </span>
+      </div>
+      <div className="row text-center">
+        <div className="col-sm-4 offset-sm-4">
+          <span className="songTitle fixToRight">{ chordName }</span>
         </div>
       </div>
     </div>
@@ -112,12 +190,13 @@ export class LessonBlock extends React.Component {
         <AudioController src="/audio/3.mp3" id="audio3" />
         <AudioController src="/audio/4.mp3" id="audio4" />
         LessonBlock type={this.lesson_type}
+        <FailedIdentification shouldShowCorrect= { true } correctChord={Chords.BIG_MAJOR} />
         <SongWithChords songData={ songData }/>
-      </div>*/
-      <div className="container">
-        <SucessIdentification />
-        <button onClick={ this.changeSong }>Change song (Testing purposes)</button>
-      </div>
+        </div>*/
+        <div className="container">
+          <SongWithoutChords songData={ songData } chordName={Chords.BIG_MAJOR} />
+          <button onClick={ this.changeSong }>Change song (Testing purposes)</button>
+        </div>
     );
   }
 }
