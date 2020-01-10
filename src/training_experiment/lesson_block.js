@@ -14,13 +14,14 @@ const SucessIdentification = () => {
 }
 
 const NameOfChord = props => {
+  let { chordName } = this.props;
   return (
     <div className = "row text-center successScreenWrapper">
       <div className="col-sm-8 offset-sm-2">
         <span className="chordName">
         שם האקורד הראשון :         
         <br />
-        מז'ור גדול
+        { chordName }
         </span>
       </div>
     </div>
