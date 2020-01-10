@@ -5,6 +5,7 @@ import { IntroText, InfoText } from './info.js';
 import { LessonType, Strings } from './defs.js';
 import { LessonBlock } from './lesson_block.js';
 import { TrainingBlock } from './training_block.js';
+import gs from '../spreadsheet_io.js';
 
 // 1st screen.
 function IntroScreen({next, data}) {
@@ -19,7 +20,8 @@ function IntroScreen({next, data}) {
       <label>"ת"ז:</label>
       <input type="text" id="id_input"/><br/>
       <button onClick={handleContinue}>{Strings.continue_text}</button>
-  </div>);
+    </div>
+  );
 }
 
 // 2nd screen. Different text per lesson type.
@@ -40,13 +42,16 @@ function FinishScreen({data}) {
 }
 
 class TrainingExperiment extends React.Component {
-  spreadsheetId = '1D2s3D13ldvchzueCFWTkvH8kzhNBEMZzizPnjGQnhMY';
-  apiKey = 'AIzaSyDHFHbGy_GhEt1Q4FW61YYEX2jk3hZcSoQ';
-  writeScriptUrl = 'https://script.google.com/macros/s/AKfycbxv6Uc9VsHlKI6SMe6YmH-MELryrJYvYg-uQnGFhyMF2X7zyC-O/exec'
-  readUrl = "https://sheets.googleapis.com/v4/spreadsheets/" 
-  
+  conn = {
+    spreadsheet_id: '1D2s3D13ldvchzueCFWTkvH8kzhNBEMZzizPnjGQnhMY',
+    api_key: 'AIzaSyDHFHbGy_GhEt1Q4FW61YYEX2jk3hZcSoQ',
+    write_url: 'https://script.google.com/macros/s/AKfycbxv6Uc9VsHlKI6SMe6YmH-MELryrJYvYg-uQnGFhyMF2X7zyC-O/exec',
+  }
+ 
+  trainingSheetName = "TrainingExperiment";
+
   state = {
-    step: 4,
+    step: 1,
     lesson_type: LessonType.MUSICAL_PIECES
   };
 
@@ -63,25 +68,18 @@ class TrainingExperiment extends React.Component {
   }
 
   componentDidMount() {
-    // read
-
-        
-    fetch(this.readUrl + this.spreadsheetId + "/values/TrainingExperiment!A2:A1000?key=" + this.apiKey)
+    // read session data
+    /* TODO:
+       read all sessions in the beginning.
+       enforce session limit.
+       find the next session number.
+       put in data.
+     */
+    gs.read(this.conn, this.trainingSheetName, "A2:E5")
       .then(response => response.json())
-      .then(data => console.log(data));
-
-    // write
-    fetch(this.writeScriptUrl + "?id=1&session_number=2&timestamp=" + Date.now(),
-          {
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            },
-            method: "GET",
-            mode: 'no-cors',
-          })
-      .then(function(res){ console.log(res); })
-      .catch(function(res){ console.log("error" + res); });
+      .then(data => console.log(data))
+      .catch(response => console.log("error: " + response)); // TODO: handle errors!
+    this.data["start_time"] = new Date().toString();
   }
 
   render() {
@@ -91,16 +89,24 @@ class TrainingExperiment extends React.Component {
     case 1:
       screen = <IntroScreen data={this.data} next={this.nextStep} />;
       break;
-    case 2:
+    case 5: // should be 2
       screen = <InfoScreen next={this.nextStep} lesson_type={this.state.lesson_type} />;
       break;
-    case 3:
+    case 4: // should be 3
       screen = <LessonBlock data={this.data} next={this.nextStep} lesson_type={this.state.lesson_type} />;
       break;
-    case 4:
+    case 3: // should be 4
       screen = <TrainingBlock data={this.data} next={this.nextStep} lesson_type={this.state.lesson_type} />;
       break;
-    case 5:
+    case 2: // should be 5
+      // end of session. 
+      this.data["end_time"] = new Date().toString();
+
+      // write data
+      gs.write(this.conn, this.trainingSheetName, this.data)
+        .then(res => console.log(res))
+        .catch(res => console.log("error" + res)); // TODO: handle errors!
+
       screen = <FinishScreen data={this.data} />;
     }
     return (
