@@ -204,11 +204,11 @@ export class LessonBlock extends React.Component {
         <AudioController src="/audio/3.mp3" id="audio3" />
         <AudioController src="/audio/4.mp3" id="audio4" />
         LessonBlock type={this.lesson_type}
-        <FailedIdentification shouldShowCorrect= { true } correctChord={Chords.BIG_MAJOR} />
-        <SongWithChords songData={ songData }/>
-        <SongWithoutChords songData={ songData } chordName={Chords.BIG_MAJOR} />
         </div>
-          //<button onClick={ this.changeSong }>Change song (Testing purposes)</button>
+          /*<button onClick={ this.changeSong }>Change song (Testing purposes)</button>
+          <FailedIdentification shouldShowCorrect= { true } correctChord={Chords.BIG_MAJOR} />
+          <SongWithChords songData={ songData }/>
+          <SongWithoutChords songData={ songData } chordName={Chords.BIG_MAJOR} />*/
     );
   }
 }
