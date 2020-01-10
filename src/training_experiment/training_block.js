@@ -66,15 +66,12 @@ export class TrainingBlock extends React.Component {
 
   render() {
     return (
-      /*<div>
+      <div>
         <AudioController src="/audio/1.mp3" id="audio1" />
         <AudioController src="/audio/2.mp3" id="audio2" />
         <AudioController src="/audio/3.mp3" id="audio3" />
         <AudioController src="/audio/4.mp3" id="audio4" />
         TrainingBlock type={this.lesson_type}
-      </div>*/
-      <div className="container">
-        <ChordSelection />
       </div>
     );
   }

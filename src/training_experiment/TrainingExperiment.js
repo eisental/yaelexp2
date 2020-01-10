@@ -62,8 +62,7 @@ class TrainingExperiment extends React.Component {
     let screen;
     switch(step) {
     case 1:
-      //screen = <IntroScreen data={this.data} next={this.nextStep} />; CHANGED THIS FOR TESTING
-      screen = <LessonBlock data={this.data} next={this.nextStep} lesson_type={this.state.lesson_type} />;
+      screen = <IntroScreen data={this.data} next={this.nextStep} />;
       break;
     case 2:
       screen = <InfoScreen next={this.nextStep} lesson_type={this.state.lesson_type} />;
@@ -79,7 +78,9 @@ class TrainingExperiment extends React.Component {
     }
     return (
         <div textAlign='center' className="App">
-          {screen}
+          <div className="container">
+            {screen}
+          </div>
         </div>
     );
   }

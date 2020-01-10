@@ -197,7 +197,7 @@ export class LessonBlock extends React.Component {
     let songData = this.state.songData;
 
     return (
-      /*<div>
+      <div>
         <img className="song_image" src="/song_images/song1.jpg" />
         <AudioController src="/audio/1.mp3" id="audio1" />
         <AudioController src="/audio/2.mp3" id="audio2" />
@@ -207,11 +207,8 @@ export class LessonBlock extends React.Component {
         <FailedIdentification shouldShowCorrect= { true } correctChord={Chords.BIG_MAJOR} />
         <SongWithChords songData={ songData }/>
         <SongWithoutChords songData={ songData } chordName={Chords.BIG_MAJOR} />
-        </div>*/
-        <div className="container">
-          <NameOfChord />
-          <button onClick={ this.changeSong }>Change song (Testing purposes)</button>
         </div>
+          //<button onClick={ this.changeSong }>Change song (Testing purposes)</button>
     );
   }
 }
