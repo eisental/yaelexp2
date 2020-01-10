@@ -4,6 +4,22 @@ export const LessonType = {
   AUTOMATIC: 2,
 };
 
+export const Chords = {
+  BIG_MAJOR: "מז'ור גדול",
+  SMALL_MAJOR: "מז'ור קטן",
+  BIG_MINOR: "מינור גדול",
+  SMALL_MINOR:"מינור קטן"
+}
+
+export const StaticImages = {
+  happySmiley: "/static_images/happySmiley.jpg",
+  sadSmiley: "/static_images/sadSmiley.png",
+}
+
 export const Strings = {
   continue_text: "הבא",
+  success_identification: "בחרת באקורד הנכון",
+  failure_identification: "בחרת באקורד הלא נכון",
+  how_it_sounds: " כך הוא נשמע",
+  failure_song_has_chord:"בשיר יש אקורד ",
 };
