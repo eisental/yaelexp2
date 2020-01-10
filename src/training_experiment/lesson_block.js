@@ -13,6 +13,20 @@ const SucessIdentification = () => {
   );
 }
 
+const NameOfChord = props => {
+  return (
+    <div className = "row text-center successScreenWrapper">
+      <div className="col-sm-8 offset-sm-2">
+        <span className="chordName">
+        שם האקורד הראשון :         
+        <br />
+        מז'ור גדול
+        </span>
+      </div>
+    </div>
+  );
+}
+
 const ShowCorrectAnswer = props => {
   const { correctChord } = props;
   return (
@@ -192,9 +206,10 @@ export class LessonBlock extends React.Component {
         LessonBlock type={this.lesson_type}
         <FailedIdentification shouldShowCorrect= { true } correctChord={Chords.BIG_MAJOR} />
         <SongWithChords songData={ songData }/>
+        <SongWithoutChords songData={ songData } chordName={Chords.BIG_MAJOR} />
         </div>*/
         <div className="container">
-          <SongWithoutChords songData={ songData } chordName={Chords.BIG_MAJOR} />
+          <NameOfChord />
           <button onClick={ this.changeSong }>Change song (Testing purposes)</button>
         </div>
     );

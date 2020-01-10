@@ -16,7 +16,7 @@
 }
 
 .chordBtn{
-  background-color:  #e7e7e7;; /* Green */
+  background-color:  #e7e7e7;; 
   border: 1px black solid;
   color: black;
   padding: 20px 35px;
@@ -44,6 +44,11 @@
   font-size: 40px;
 }
 
+.chordName{
+  font-size: 40px;
+  font-weight: bold;
+}
+
 .clearBoth{
   clear:both;
 }
@@ -54,6 +59,10 @@
 
 .chords{
   margin-top:10px;
+}
+
+.plusSign{
+  font-size: 100px;
 }
 
 .App-header {
