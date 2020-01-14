@@ -110,9 +110,11 @@ class TrainingExperiment extends React.Component {
       screen = <FinishScreen data={this.data} />;
     }
     return (
-        <Container textAlign='center' className="App">
-          {screen}
-        </Container>
+        <div textAlign='center' className="App">
+          <div className="container">
+            {screen}
+          </div>
+        </div>
     );
   }
 }

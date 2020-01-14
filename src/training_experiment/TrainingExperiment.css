@@ -7,6 +7,64 @@
   pointer-events: none;
 }
 
+.successScreenWrapper{
+  margin-top: 15%;
+}
+
+.songDisplayWrapper{
+  margin-top:1%;
+}
+
+.chordBtn{
+  background-color:  #e7e7e7;; 
+  border: 1px black solid;
+  color: black;
+  padding: 20px 35px;
+  margin-left: 5%;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+
+.songImage{
+  width:170px;
+  height:170px;
+  float:right;
+}
+
+.songTitleWrapper{
+  float:right;
+  width: 40%;
+  margin-right: 5%;
+  margin-top: 2%;
+}
+
+.songTitle{
+  font-size: 40px;
+}
+
+.chordName{
+  font-size: 40px;
+  font-weight: bold;
+}
+
+.clearBoth{
+  clear:both;
+}
+
+.fixToRight{
+  margin-left: 10%;
+}
+
+.chords{
+  margin-top:10px;
+}
+
+.plusSign{
+  font-size: 100px;
+}
+
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
