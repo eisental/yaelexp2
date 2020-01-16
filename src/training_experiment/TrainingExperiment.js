@@ -34,9 +34,10 @@ function InfoScreen({next, lesson_type}) {
   );
 }
 
-function FinishScreen({data}) {
+function FinishScreen({data, doneSaving}) {
   return (<div>
-          Finish text goes here<br/>
+          {doneSaving ? "Saved data!" : "Saving data, please wait..."}<br/>
+          Session number x / y<br/>
           data = {data.id}
           </div>);
 }
@@ -50,9 +51,19 @@ class TrainingExperiment extends React.Component {
  
   trainingSheetName = "TrainingExperiment";
 
+  steps = {
+    INTRO: 1,
+    INFO: 2, 
+    LESSON: 3,
+    TRAINING: 4,
+    FINISH: 5
+  }
+
   state = {
     step: 1,
-    lesson_type: LessonType.MUSICAL_PIECES
+    lesson_type: LessonType.MUSICAL_PIECES,
+    isLoading: true, // true until session data is received.
+    doneSaving: false, // false until the data is saved to the spreadsheet.
   };
 
   data = {
@@ -61,24 +72,60 @@ class TrainingExperiment extends React.Component {
   
   nextStep = () => {
     const { step } = this.state;
+    
     this.setState({
       step: step + 1
     });
-    console.log(this.data);
+
+    this.stepChanged(step + 4);
+  }
+
+  stepChanged = (step) => {
+    console.log("stepChanged: " + step);
+    if (step == this.steps.FINISH) {
+      // end of session. 
+      this.data["end_time"] = new Date().toString();
+
+      // write data
+      let that = this;
+      console.log("Saving data...");
+      gs.write(this.conn, this.trainingSheetName, this.data)
+        .then(res => { that.setState({doneSaving: true}); })
+        .catch(this.dataSaveError);
+    }
+  }
+
+  dataSaveError = (response) => {
+    console.log("error" + response);
+  }
+
+  sessionDataLoaded = (data) => {
+    console.log("data:");
+    console.log(data);
+
+    this.setState({ isLoading: false });
+  }
+
+  sessionDataLoadError = (response) => {
+    // ask to refresh the page, try again... contact info?
+    console.log("error: " + response);
   }
 
   componentDidMount() {
     // read session data
     /* TODO:
+       create another spreadsheet just for sessions! one row begins session another ends.
        read all sessions in the beginning.
        enforce session limit.
        find the next session number.
        put in data.
      */
+    var that = this;
+
     gs.read(this.conn, this.trainingSheetName, "A2:E5")
       .then(response => response.json())
-      .then(data => console.log(data))
-      .catch(response => console.log("error: " + response)); // TODO: handle errors!
+      .then(that.sessionDataLoaded)
+      .catch(that.sessionDataLoadError); // TODO: handle errors!
     this.data["start_time"] = new Date().toString();
   }
 
@@ -89,26 +136,22 @@ class TrainingExperiment extends React.Component {
     case 1:
       screen = <IntroScreen data={this.data} next={this.nextStep} />;
       break;
-    case 5: // should be 2
+    case 2:
       screen = <InfoScreen next={this.nextStep} lesson_type={this.state.lesson_type} />;
       break;
-    case 4: // should be 3
+    case 3:
       screen = <LessonBlock data={this.data} next={this.nextStep} lesson_type={this.state.lesson_type} />;
       break;
-    case 3: // should be 4
+    case 4:
       screen = <TrainingBlock data={this.data} next={this.nextStep} lesson_type={this.state.lesson_type} />;
       break;
-    case 2: // should be 5
-      // end of session. 
-      this.data["end_time"] = new Date().toString();
-
-      // write data
-      gs.write(this.conn, this.trainingSheetName, this.data)
-        .then(res => console.log(res))
-        .catch(res => console.log("error" + res)); // TODO: handle errors!
-
-      screen = <FinishScreen data={this.data} />;
+    case 5:
+      screen = <FinishScreen data={this.data} doneSaving={this.state.doneSaving}/>;
     }
+
+    if (this.state.isLoading)
+      screen = <div>Loading...</div>;
+
     return (
         <div textAlign='center' className="App">
           <div className="container">

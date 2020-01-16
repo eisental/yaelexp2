@@ -53,9 +53,6 @@ const ChordSelection = props => {
   );
 }
 
-
->>>>>>> 7a7dcb9c0e414a3db58499e23e57dd5a4f48e31f
-
 export class TrainingBlock extends React.Component {
   constructor({data, lesson_type, next}) {
     super();

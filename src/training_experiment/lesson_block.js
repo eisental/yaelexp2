@@ -178,7 +178,7 @@ export class LessonBlock extends React.Component {
     this.audioController = React.createRef();
     this.state = {
       songData: {
-        imgSrc: "/song_images/song4.jpg",
+        imgSrc: "/song_images/song3.jpg",
         name: "הליכה לקיסריה",
       }
     }
@@ -195,7 +195,7 @@ export class LessonBlock extends React.Component {
   }
   
   componentDidMount() {
-    this.audioController.current.play(2);
+    //this.audioController.current.play(2);
   }
 
   render() {
@@ -206,18 +206,17 @@ export class LessonBlock extends React.Component {
 
     return (
       <div>
-        <img className="song_image" src="/song_images/song1.jpg" />
         LessonBlock type={this.lesson_type}
         <AudioController
           srcs={srcs} id="audio" 
           onDoneLoading={() => console.log("finished loading audio sources.")}
           onAudioEnded={(i) => console.log("finished playing audio " + i)}
           ref={this.audioController} />
+        <button onClick={ this.changeSong }>Change song (Testing purposes)</button>
+        <FailedIdentification shouldShowCorrect= { true } correctChord={Chords.BIG_MAJOR} />
+        <SongWithChords songData={ songData }/>
+        <SongWithoutChords songData={ songData } chordName={Chords.BIG_MAJOR} />
       </div>
-            /*<button onClick={ this.changeSong }>Change song (Testing purposes)</button>
-          <FailedIdentification shouldShowCorrect= { true } correctChord={Chords.BIG_MAJOR} />
-          <SongWithChords songData={ songData }/>
-          <SongWithoutChords songData={ songData } chordName={Chords.BIG_MAJOR} />*/
     );
   }
 }
