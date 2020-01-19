@@ -8,7 +8,7 @@ export const Chords = {
   BIG_MAJOR: "מז'ור גדול",
   SMALL_MAJOR: "מז'ור קטן",
   BIG_MINOR: "מינור גדול",
-  SMALL_MINOR:"מינור קטן"
+  HALF_DIM:"חצי מוקטן"
 }
 
 export const StaticImages = {
@@ -23,3 +23,8 @@ export const Strings = {
   how_it_sounds: " כך הוא נשמע",
   failure_song_has_chord:"בשיר יש אקורד ",
 };
+
+export const SheetNames = {
+  TRAINING_SESSIONS: "TrainingSessions",
+  TRAINING_DATA: "TrainingExperiment",
+}

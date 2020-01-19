@@ -31,7 +31,8 @@ const gs = {
   },
 
   write: function(conn, sheetName, data) {
-    return fetch(conn.write_url + "?" + serialize(data),
+    let url = conn.write_url + "?" + serialize(data) + "&sheet_name=" + sheetName;
+    return fetch(url,
                  {
                    headers: {
                      'Accept': 'application/json',

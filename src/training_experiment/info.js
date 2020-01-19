@@ -1,5 +1,5 @@
 import React from 'react';
-import { LessonType } from './defs.js'
+import { LessonType } from '../defs.js'
 
 export function IntroText() {
   return (
