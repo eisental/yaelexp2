@@ -32,7 +32,11 @@ TrainingExperiment: run sequence of screens
 
 Data:
 - id
+- session number?
 - session timing (start, end)
+  - `start_time, end_time`
+  - set by: IntroScreen, Finishscreen
+  - each id has many sessions. 
 - for each training screen:
   - recording number
   - chord number (1-96)
@@ -41,6 +45,18 @@ Data:
   - transposition play index
   - selected chord type (same as chord type)
   - is correct?
+
+record:
+
+`id | session_number | start_time | end_time | time | audio_index | chord_number | chord_type | transposition | transposition_play_count | selected_chord_type | correct? |`
+
+spreadsheet:
+https://docs.google.com/spreadsheets/d/1D2s3D13ldvchzueCFWTkvH8kzhNBEMZzizPnjGQnhMY/edit#gid=0
+
+  spreadsheetId = '1D2s3D13ldvchzueCFWTkvH8kzhNBEMZzizPnjGQnhMY';
+  apiKey = 'AIzaSyDHFHbGy_GhEt1Q4FW61YYEX2jk3hZcSoQ';
+  writeScriptUrl = 'https://script.google.com/macros/s/AKfycbxv6Uc9VsHlKI6SMe6YmH-MELryrJYvYg-uQnGFhyMF2X7zyC-O/exec'
+  readUrl = "https://sheets.googleapis.com/v4/spreadsheets/" 
 
 TestExperiment: 
 
