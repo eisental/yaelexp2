@@ -22,7 +22,6 @@ export const parseSessions = (data) => {
 };
 
 export const writeSessionEvent = (conn, session, event, on_error) => {
-  let that = this;
   let request_data = Object.assign({event: event,
                                     time: new Date().toString()},
                                    session);

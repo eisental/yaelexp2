@@ -1,6 +1,5 @@
 import React from 'react';
 import './TrainingExperiment.css';
-import { Container } from 'semantic-ui-react';
 import { IntroText, InfoText } from './info.js';
 import { LessonType, Strings, SheetNames } from '../defs.js';
 import { LessonBlock } from './lesson_block.js';
@@ -44,17 +43,17 @@ function FinishScreen({data, doneSaving}) {
 }
 
 class TrainingExperiment extends React.Component {
-  conn = {
+  conn = { // read/write connection details for google spreadsheet.
     spreadsheet_id: '1D2s3D13ldvchzueCFWTkvH8kzhNBEMZzizPnjGQnhMY',
     api_key: 'AIzaSyDHFHbGy_GhEt1Q4FW61YYEX2jk3hZcSoQ',
     write_url: 'https://script.google.com/macros/s/AKfycbxv6Uc9VsHlKI6SMe6YmH-MELryrJYvYg-uQnGFhyMF2X7zyC-O/exec',
   }
  
   steps = {
-    INTRO: 3,
+    INTRO: 1,
     INFO: 2, 
-    LESSON: 4,
-    TRAINING: 1,
+    LESSON: 3,
+    TRAINING: 4,
     FINISH: 5
   }
 
@@ -85,7 +84,7 @@ class TrainingExperiment extends React.Component {
   }
 
   stepWillChange = (step) => {
-    if (step == this.steps.INTRO) {
+    if (step === this.steps.INTRO) {
       console.log("got some session data:");
       console.log(this.state.sessions);
 
@@ -94,8 +93,8 @@ class TrainingExperiment extends React.Component {
       // start session
       this.session.id = this.data.id;
       this.session.number = 666;
-      writeSessionEvent(this.conn, this.session, 
-                        SessionEvent.SESSION_START, this.sessionEventError);
+      //writeSessionEvent(this.conn, this.session, 
+        //                SessionEvent.SESSION_START, this.sessionEventError);
 
     }
   } 
@@ -103,7 +102,7 @@ class TrainingExperiment extends React.Component {
   stepChanged = (step) => {
     console.log("stepChanged: " + step);
 
-    if (step == this.steps.FINISH) {
+    if (step === this.steps.FINISH) {
       // end of session. 
       this.data.end_time = new Date().toString();
 
@@ -131,7 +130,6 @@ class TrainingExperiment extends React.Component {
 
   sessionDataLoaded = (session_data) => {
     console.log("got session data");
-    console.log(session_data);
     this.setState({ isLoading: false,
                     sessions: session_data});
   }
@@ -144,7 +142,6 @@ class TrainingExperiment extends React.Component {
   componentDidMount() {
     // read session data
     /* TODO:
-       create another spreadsheet just for sessions! one row begins session another ends.
        read all sessions in the beginning.
        enforce session limit.
        find the next session number.
@@ -152,10 +149,11 @@ class TrainingExperiment extends React.Component {
      */
     var that = this;
     
-    readSessionData(this.conn)
+    /* readSessionData(this.conn)
       .then(that.sessionDataLoaded)
       .catch(that.sessionDataLoadError); // TODO: handle errors!
-    
+    */
+    that.sessionDataLoaded();
     this.data.start_time = new Date().toString();
   }
 
