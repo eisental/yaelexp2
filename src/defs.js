@@ -7,7 +7,7 @@ export const LessonType = {
 export const Chords = {
   BIG_MAJOR: "מז'ור גדול",
   SMALL_MAJOR: "מז'ור קטן",
-  BIG_MINOR: "מינור גדול",
+  SMALL_MINOR: "מינור קטן",
   HALF_DIM:"חצי מוקטן"
 }
 
@@ -28,3 +28,22 @@ export const SheetNames = {
   TRAINING_SESSIONS: "TrainingSessions",
   TRAINING_DATA: "TrainingExperiment",
 }
+
+// For MUSICAL_CONTEXT lessons. A mapping of chord name to the image and song name that goes with it.
+export let musical_pieces_data = {};
+musical_pieces_data[Chords.BIG_MAJOR] = {
+  imgSrc: "/song_images/song1.png",
+  name: "Imagine",
+};
+musical_pieces_data[Chords.SMALL_MAJOR] = {
+  imgSrc: "/song_images/song2.png",
+  name: "הליכה לקיסריה"
+};
+musical_pieces_data[Chords.SMALL_MINOR] = {
+  imgSrc: "/song_images/song3.png",
+  name: "Rocket man"
+};
+musical_pieces_data[Chords.HALF_DIM] = {
+  imgSrc: "/song_images/song4.png",
+  name: "ברית עולם"
+};

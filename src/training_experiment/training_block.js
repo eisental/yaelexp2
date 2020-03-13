@@ -8,7 +8,7 @@ const SucessIdentification = () => {
     <div className="row successScreenWrapper">
       <div className="col-sm-8 offset-sm-2">
         <span className="songTitle"> { Strings.success_identification } &nbsp;</span>
-        <img src= { StaticImages.happySmiley } width="150px" height="150px"/>
+        <img src= { StaticImages.happySmiley } width="150px" height="150px" alt=""/>
       </div>
     </div>
   );
@@ -34,7 +34,7 @@ const ShowCorrectAnswer = props => {
       </div>
     </div>
   );
-}
+};
 
 const FailedIdentification = props => {
   const { shouldShowCorrect } = props;
@@ -49,7 +49,7 @@ const FailedIdentification = props => {
       <div className="row">
         <div className="col-sm-8 offset-sm-2">
             <span className="songTitle"> { Strings.failure_identification } &nbsp;</span>
-            <img src= { StaticImages.sadSmiley } width="150px" height="150px"/>
+            <img src= { StaticImages.sadSmiley } width="150px" height="150px" alt=""/>
         </div>
       </div>
       <div className="row">
@@ -91,7 +91,7 @@ const SongWithChords = props => {
       </div>
     </div>
   );
-}
+};
 
 const ChordSelection = props => {
   let { chords } = props;
@@ -142,7 +142,7 @@ const ChordSelection = props => {
       </div>
     </div>
   );
-}
+};
 
 export class TrainingBlock extends React.Component {
   constructor({data, lesson_type, next}) {
@@ -150,30 +150,15 @@ export class TrainingBlock extends React.Component {
     this.data = data;
     this.lesson_type = lesson_type;
     this.next = next;
-    this.audioController = React.createRef();
-    this.state = {
-      songData: {
-        imgSrc: "/song_images/song3.jpg",
-        name: "הליכה לקיסריה",
-      }
-    };
 
     // TODO: choose button order for the whole thing. read chordNames values and shuffle.
     
   }
 
   render() {
-    let currentAudio = 2;
-    let srcs = [0,1,2,3].map(i => "/audio/" + (i+1) + ".mp3");
     return (
       <div>
-        <AudioController 
-          srcs={srcs} id="audio" 
-          onDoneLoading={() => console.log("finished loading audio sources.")}
-          onAudioEnded={(i) => console.log("finished playing audio " + i)}
-          ref={this.audioController} />
         <ChordSelection />
-
         TrainingBlock type={this.lesson_type}
       </div>
     );
