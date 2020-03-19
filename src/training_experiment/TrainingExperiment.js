@@ -6,6 +6,7 @@ import { LessonBlock } from './lesson_block.js';
 import { TrainingBlock } from './training_block.js';
 import { does_user_sheet_exists, was_last_session_today, SessionEvent, writeSessionEvent, readSessionData } from '../sessions.js';
 import gs from '../spreadsheet_io.js';
+import ls from 'local-storage';
 
 // 1st screen.
 function IntroScreen({next, data}) {
@@ -55,9 +56,9 @@ class TrainingExperiment extends React.Component {
   steps = {
     INTRO: 1,
     INFO: 2, 
-    LESSON: 5,
-    TRAINING: 4,
-    FINISH: 3
+    LESSON: 3,
+    TRAINING: 5,
+    FINISH: 4
   }
 
   state = {
@@ -105,7 +106,29 @@ class TrainingExperiment extends React.Component {
           this.session.number = last_session_number;
           writeSessionEvent(this.conn, this.session, 
                             SessionEvent.SESSION_CONTINUED, this.sessionEventError);
-          // TODO: Retreive session from local storage. (save it maybe on nextStep)
+          // Retreive session and data from local storage.
+          const continued_session = ls.get('session');
+          console.log("continued_session:");
+          console.log(continued_session);
+          if (continued_session) {
+            console.log("Loading session data from local storage.");
+            this.session = continued_session;
+          }
+
+          const continued_data = ls.get('data');
+          console.log("continued_data:");
+          console.log(continued_data);
+          if (continued_data) {
+            console.log("Loading experiment data from local storage.");
+            this.data = continued_data;
+          }
+
+          const continued_step = ls.get('step');
+          console.log("continued_step:");
+          console.log(continued_step);
+          if (continued_step) {
+            this.setState({step: continued_step});
+          }
         }
         else {
           // A new day. TODO: what happens when max session reached on unfinished session?
@@ -146,7 +169,8 @@ class TrainingExperiment extends React.Component {
 
   nextStep = () => {
     const { step } = this.state;
-
+    if (step > 1) // otherwise the key will be overwritten before loading.
+      ls.set('step', step + 1);
     this.stepWillChange(step);
     this.setState({
       step: step + 1
@@ -170,7 +194,10 @@ class TrainingExperiment extends React.Component {
 
   stepChanged = (step) => {
     console.log("stepChanged: " + step);
-
+    
+    // TEMPORARY: save data to local storage.
+    ls.set('data', this.data);
+    
     if (step === this.steps.FINISH) {
       // end of session. 
       this.data.end_time = new Date().toString();
@@ -186,7 +213,10 @@ class TrainingExperiment extends React.Component {
       // write session ended event
       writeSessionEvent(this.conn, this.session, 
                         SessionEvent.SESSION_END, this.sessionEventError);
-      // TODO: need to make sure both writes finished before setting doneSaving: true!
+      // TODO: need to make sure both writes finished before setting done_saving: true!
+
+      // clear session from local storage. TODO: also do this only after both saves are done.
+      ls.clear();
     }
   }
 

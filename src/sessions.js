@@ -1,5 +1,6 @@
 import gs from './spreadsheet_io.js';
 import { SheetNames } from './defs.js';
+import ls from 'local-storage';
 
 const FIRST_HOUR_OF_DAY = 3; // day starts at 3 am.
 
@@ -34,6 +35,7 @@ export const writeSessionEvent = (conn, session, event, on_error) => {
     .then(res => { console.log(res); })
     .catch(on_error);
 
+  ls.set('session', session);
 };
 
 export const readSessionData = (conn) => {
