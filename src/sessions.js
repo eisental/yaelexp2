@@ -49,5 +49,10 @@ export const was_last_session_today = (last_session) => {
   last_time.setHours(last_time.getHours() - FIRST_HOUR_OF_DAY);
   let now = new Date();
   now.setHours(now.getHours() - FIRST_HOUR_OF_DAY);
-  return now.getDate() == last_time.getDate();
+  return now.getDate() === last_time.getDate();
+};
+
+export const does_user_sheet_exists = (conn, user_id) => {
+  return gs.list_sheets(conn)
+    .then(sheets => sheets.includes(user_id));
 };

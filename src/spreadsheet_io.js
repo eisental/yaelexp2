@@ -20,6 +20,14 @@ const serialize = function(obj, prefix) {
   return str.join("&");
 }
 
+const parse_sheet_list = (data) => {
+  let sheetNames = [];
+  data.sheets.forEach(sheet => {
+    sheetNames.push(sheet.properties.title);
+  });
+  return sheetNames;
+};
+
 const gs = {
   read: function(conn, sheetName, range) {
     return fetch(read_url + 
@@ -41,6 +49,12 @@ const gs = {
                    method: "GET",
                    mode: 'no-cors',
                  })    
+  },
+
+  list_sheets: function(conn) {
+    return fetch(read_url + conn.spreadsheet_id + "?key=" + conn.api_key)
+      .then(res => res.json())
+      .then(parse_sheet_list);
   },
 }
 

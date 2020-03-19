@@ -204,7 +204,7 @@ export class LessonBlock extends React.Component {
     this.setState({
       step: step + 1
     });
-    if (step + 1 == this.steps.DONE)
+    if (step + 1 === this.steps.DONE)
       this.next();
   }
 

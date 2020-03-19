@@ -4,7 +4,7 @@ import { IntroText, InfoText } from './info.js';
 import { LessonType, Strings, SheetNames } from '../defs.js';
 import { LessonBlock } from './lesson_block.js';
 import { TrainingBlock } from './training_block.js';
-import { was_last_session_today, SessionEvent, parseSessions, writeSessionEvent, readSessionData } from '../sessions.js';
+import { does_user_sheet_exists, was_last_session_today, SessionEvent, writeSessionEvent, readSessionData } from '../sessions.js';
 import gs from '../spreadsheet_io.js';
 
 // 1st screen.
@@ -63,10 +63,13 @@ class TrainingExperiment extends React.Component {
   state = {
     step: 1,
     lesson_type: LessonType.MUSICAL_PIECES,
-    isLoading: true, // true until session data is received.
-    doneSaving: false, // false until the data is saved to the spreadsheet.
+    is_loading_session: true, // true until session data is received.
+    did_check_user_registered: false, // false until sheet list is received.
+    done_saving: false, // false until the data is saved to the spreadsheet.
     max_sessions_reached: false,
     session_done_for_today: false,
+    user_unregistered: true,
+    did_load_registration_list: false,
   };
 
   data = {
@@ -77,6 +80,69 @@ class TrainingExperiment extends React.Component {
     id: undefined,
     number: undefined
   };
+
+  maybe_start_session = () => {
+    // Check previous sessions data. Start a new session accordingly
+    // or enforce session limits.
+    this.session.id = this.data.id;
+    const previous_sessions = this.sessions.filter(e => e.id === this.session.id);
+    
+    if (previous_sessions.length === 0) {
+      // First session
+      this.session.number = 0;
+      writeSessionEvent(this.conn, this.session, 
+                        SessionEvent.SESSION_START);
+    }
+    else {
+      // Not first session
+      const last_session = previous_sessions[previous_sessions.length-1];
+      const last_session_number = parseInt(last_session.number);
+      
+      if (last_session.event !== SessionEvent.SESSION_END) {
+        // The last session for this subject id isn't finished.
+        if (was_last_session_today(last_session)) {
+          // Same day. Try to continue the last session.
+          this.session.number = last_session_number;
+          writeSessionEvent(this.conn, this.session, 
+                            SessionEvent.SESSION_CONTINUED, this.sessionEventError);
+          // TODO: Retreive session from local storage. (save it maybe on nextStep)
+        }
+        else {
+          // A new day. TODO: what happens when max session reached on unfinished session?
+          if (last_session_number + 1 >= this.MAX_NUMBER_OF_SESSIONS) {
+            // enforce the session limit.
+            this.setState({max_sessions_reached: true});
+          } 
+          else {
+            // Continue to next session. 
+            // TODO: should this automatically add another lesson? or just use the same session number?
+            this.session.number = last_session_number + 1;
+            writeSessionEvent(this.conn, this.session, 
+                              SessionEvent.SESSION_START);
+          }
+        }
+      }
+      else {
+        // The last session was finished. 
+        if (last_session_number + 1 >= this.MAX_NUMBER_OF_SESSIONS) {
+          // enforce the session limit.
+          this.setState({max_sessions_reached: true});
+        }
+        else {
+          if (!was_last_session_today(last_session)) {
+            // Start a new session
+            this.session.number = last_session_number + 1;
+            writeSessionEvent(this.conn, this.session, 
+                              SessionEvent.SESSION_START);
+          }
+          else {
+            // No more sessions for today.
+            this.setState({session_done_for_today: true});
+          }
+        }
+      }
+    }
+  }
 
   nextStep = () => {
     const { step } = this.state;
@@ -90,66 +156,15 @@ class TrainingExperiment extends React.Component {
 
   stepWillChange = (step) => {
     if (step === this.steps.INTRO) {
-      // Check previous sessions data. Start a new session accordingly
-      // or enforce session limits.
-      this.session.id = this.data.id;
-      const previous_sessions = this.sessions.filter(e => e.id === this.session.id);
-
-      if (previous_sessions.length == 0) {
-        // First session
-        this.session.number = 0;
-        writeSessionEvent(this.conn, this.session, 
-                          SessionEvent.SESSION_START);
-      }
-      else {
-        // Not first session
-        const last_session = previous_sessions[previous_sessions.length-1];
-        const last_session_number = parseInt(last_session.number);
-
-        if (last_session.event !== SessionEvent.SESSION_END) {
-          // The last session for this subject id isn't finished.
-          if (was_last_session_today(last_session)) {
-            // Same day. Try to continue the last session.
-            this.session.number = last_session_number;
-            writeSessionEvent(this.conn, this.session, 
-                              SessionEvent.SESSION_CONTINUED, this.sessionEventError);
-            // TODO: Retreive session from local storage. (save it maybe on nextStep)
+      does_user_sheet_exists(this.conn, this.data.id)
+        .then((sheet_exists) => { 
+          this.setState({did_load_registration_list: true});
+          if (sheet_exists) {
+            this.setState({user_unregistered: false});
+            this.maybe_start_session(); 
           }
-          else {
-            // A new day. TODO: what happens when max session reached on unfinished session?
-            if (last_session_number + 1 >= this.MAX_NUMBER_OF_SESSIONS) {
-              // enforce the session limit.
-              this.setState({max_sessions_reached: true});
-            } 
-            else {
-              // Continue to next session. 
-              // TODO: should this automatically add another lesson? or just use the same session number?
-              this.session.number = last_session_number + 1;
-              writeSessionEvent(this.conn, this.session, 
-                                SessionEvent.SESSION_START);
-            }
-          }
-        }
-        else {
-          // The last session was finished. 
-          if (last_session_number + 1 >= this.MAX_NUMBER_OF_SESSIONS) {
-            // enforce the session limit.
-            this.setState({max_sessions_reached: true});
-          }
-          else {
-            if (!was_last_session_today(last_session)) {
-              // Start a new session
-              this.session.number = last_session_number + 1;
-              writeSessionEvent(this.conn, this.session, 
-                                SessionEvent.SESSION_START);
-            }
-            else {
-              // No more sessions for today.
-              this.setState({session_done_for_today: true});
-            }
-          }
-        }
-      }
+          else this.setState({user_unregistered: true});
+        }).catch(this.sessionDataLoadError);
     }
   } 
 
@@ -163,8 +178,9 @@ class TrainingExperiment extends React.Component {
       // write data
       let that = this;
       console.log("Saving data...");
-      gs.write(this.conn, SheetNames.TRAINING_DATA, this.data)
-        .then(res => { that.setState({doneSaving: true}); })
+      this.data.session_number = this.session.number;
+      gs.write(this.conn, this.data.id, this.data)
+        .then(res => { that.setState({done_saving: true}); })
         .catch(this.dataSaveError);
 
       // write session ended event
@@ -183,7 +199,7 @@ class TrainingExperiment extends React.Component {
   }
 
   sessionDataLoaded = (session_data) => {
-    this.setState({ isLoading: false });
+    this.setState({ is_loading_session: false });
     this.sessions = session_data;
   }
 
@@ -226,16 +242,24 @@ class TrainingExperiment extends React.Component {
       screen = <TrainingBlock data={this.data} next={this.nextStep} lesson_type={this.state.lesson_type} />;
       break;
     case this.steps.FINISH:
-      screen = <FinishScreen data={this.data} doneSaving={this.state.doneSaving}/>;
+      screen = <FinishScreen data={this.data} doneSaving={this.state.done_saving}/>;
     }
 
-    if (this.state.isLoading)
+    if (this.state.is_loading_session)
       screen = <div>Loading...</div>;
-
-    if (this.state.max_sessions_reached)
-      screen = <div>Max sessions reached!</div>;
-    else if (this.state.session_done_for_today)
-      screen = <div>No more sessions allowed today!</div>;
+    if (this.state.step == 2) {
+      // After entering ID on the intro screen we check the session data before continuing.
+      if (!this.state.did_load_registration_list) 
+        screen = <div>Waiting for registered users list...</div>;
+      else {
+        if (this.state.max_sessions_reached)
+          screen = <div>Max sessions reached!</div>;
+        else if (this.state.session_done_for_today)
+          screen = <div>No more sessions allowed today!</div>;
+        else if (this.state.did_load_registration_list && this.state.user_unregistered)
+          screen = <div>Unregistered user id!</div>;
+      }
+    }
 
     return (
         <div textalign='center' className="App">
