@@ -1,4 +1,4 @@
-let audioIdx2File = (idx) => "/audio/" + idx + ".mp3";
+let audioIdx2File = (idx) => "audio/" + idx + ".mp3";
 
 export class AudioController {
   constructor(srcs, onDoneLoading, onAudioEnded) {

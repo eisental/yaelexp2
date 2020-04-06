@@ -17,8 +17,8 @@ export const Timbres = {
 }
 
 export const StaticImages = {
-  happySmiley: "/static_images/happySmiley.jpg",
-  sadSmiley: "/static_images/sadSmiley.png",
+  happySmiley: "static_images/happySmiley.jpg",
+  sadSmiley: "static_images/sadSmiley.png",
 }
 
 export const Strings = {
@@ -37,18 +37,18 @@ export const SheetNames = {
 // For MUSICAL_CONTEXT lessons. A mapping of chord name to the image and song name that goes with it.
 export let musical_pieces_data = {};
 musical_pieces_data[Chords.BIG_MAJOR] = {
-  imgSrc: "/song_images/song1.png",
+  imgSrc: "song_images/song1.png",
   name: "Imagine",
 };
 musical_pieces_data[Chords.SMALL_MAJOR] = {
-  imgSrc: "/song_images/song2.png",
+  imgSrc: "song_images/song2.png",
   name: "הליכה לקיסריה"
 };
 musical_pieces_data[Chords.SMALL_MINOR] = {
-  imgSrc: "/song_images/song3.png",
+  imgSrc: "song_images/song3.png",
   name: "Rocket man"
 };
 musical_pieces_data[Chords.HALF_DIM] = {
-  imgSrc: "/song_images/song4.png",
+  imgSrc: "song_images/song4.png",
   name: "ברית עולם"
 };
