@@ -224,6 +224,10 @@ export class LessonBlock extends React.Component {
     if (step + 1 === this.steps.DONE)
       this.next();
   }
+
+  state = {
+    step: 1,
+  };
   
   constructor({data, session, next}) {
     super();
