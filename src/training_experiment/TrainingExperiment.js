@@ -294,7 +294,7 @@ class TrainingExperiment extends React.Component {
     readSessionData(this.conn)
       .then(that.sessionDataLoaded)
       .catch(that.sessionDataLoadError); // TODO: handle errors!
-        
+
     this.data.start_time = new Date().toString();
   }
 
