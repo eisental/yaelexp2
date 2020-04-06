@@ -1,8 +1,9 @@
 import React from 'react';
 import { musical_pieces_data, LessonType, Strings, Chords } from '../defs.js';
 import { AudioController } from '../audio_controller.js';
-import { SongHeader } from '../ui.js';
+import { InfoScreen, SongHeader, LoadingScreen, ContinueButton } from '../ui.js';
 import { randomSequence } from '../randomize.js';
+import ls from 'local-storage';
 
 // Recordings used in each lesson type and part. i.e. 
 // for part 1 and musical_pieces lesson: lesson_data.musical_pieces[1]
@@ -37,7 +38,7 @@ const NameOfChord = props => {
 
   return (
     <div className = "row text-center successScreenWrapper">
-      <div className="col-sm-8 offset-sm-2">
+      <div className="col-sm-8 offset-sm-2 align-middle">
         <span className="chordName">
           {description}
         <br />
@@ -58,11 +59,11 @@ const SongWithoutChords = props => {
       <div className="row"><div className="col-sm-12">&nbsp;</div></div>
       <div className="row"><div className="col-sm-12">&nbsp;</div></div>
       <div className="row">
-        <span className="col-sm-4 offset-sm-4">
-          <span className="songTitle fixToRight">
+        <div className="col-sm-4 offset-sm-4 text-center">
+          <span className="songTitle">
           שם האקורד:
           </span>
-        </span>
+        </div>
       </div>
       <div className="row text-center">
         <div className="col-sm-4 offset-sm-4">
@@ -79,17 +80,18 @@ class LessonPart extends React.Component {
   state = {
     trial_idx: 15,
     done_playing: false,
+    done_loading: false,
   };
 
-  constructor({part, lesson_type, next}) {
+  constructor({part, session, next}) {
     super();
     this.part = part;
-    this.lesson_type = lesson_type;
     this.next = next;
     this.state.done_loading = false;
     this.trials_per_part = 16;
-    
-    switch (lesson_type) {
+    this.session = session;
+
+    switch (this.session.lesson_type) {
     case LessonType.MUSICAL_PIECES:
       this.part_data = lesson_data.musical_pieces[part];
       break;
@@ -101,15 +103,24 @@ class LessonPart extends React.Component {
       break;
     };
 
-    this.sequence = randomSequence(this.part_data, this.trials_per_part);
+    this.ls_prefix = "lesson_part" + part + "_";
+    if (session.continued) {
+      this.sequence = ls.get(this.ls_prefix + "sequence");
+      const trial_idx = ls.get(this.ls_prefix + "trial_idx");
+      if (trial_idx !== null) this.state.trial_idx = trial_idx;
+      session.continued = false;
+    }
+    else {
+      this.sequence = randomSequence(this.part_data, this.trials_per_part);
+      ls.set(this.ls_prefix + "sequence", this.sequence);
+      ls.set(this.ls_prefix + "trial_idx", this.state.trial_idx);
+    }
 
     console.log("LESSON PART " + part + " sequence:");
     console.log(this.sequence);
 
     const that = this;
     const doneLoadingAudio = () => {
-      console.log(that.audioController);
-      console.log(that);
       that.setState({done_loading: true});
       that.audioController.play(this.sequence[that.state.trial_idx][0]);
     };
@@ -125,10 +136,11 @@ class LessonPart extends React.Component {
     const that = this;
     const nextTrial = () => {
       const trial_idx = that.state.trial_idx;
-      if (that.state.trial_idx < that.trials_per_part - 1) {
+      if (trial_idx < that.trials_per_part - 1) {
         that.setState({trial_idx: trial_idx+1,
                        done_playing: false});
         that.audioController.play(this.sequence[trial_idx+1][0]);
+        ls.set(this.ls_prefix + "trial_idx", trial_idx + 1);
       }
       else {
         that.next();
@@ -141,26 +153,29 @@ class LessonPart extends React.Component {
     console.log("rendering part " + this.part + " trial " + this.state.trial_idx);
     if (this.state.done_loading) {
       let screen;
-      if (this.lesson_type === LessonType.MUSICAL_PIECES) {
+      if (this.session.lesson_type === LessonType.MUSICAL_PIECES) {
         screen = <SongWithoutChords chordName={chordName} songData={songData}/>;
       }
       else {
-        screen = <NameOfChord chordName={chordName} lesson_type={this.lesson_type}/>;
+        screen = <NameOfChord chordName={chordName} lesson_type={this.session.lesson_type}/>;
       }
-
-      let nextButton = this.state.done_playing ? 
-          <button onClick={nextTrial}>{Strings.continue_text}</button> :
-          <button onClick={nextTrial} disabled>{Strings.continue_text}</button>;
+      const button = this.state.done_playing ? (
+          <div className="row">
+            <div className="col-sm-8 offset-sm-2 text-center">
+              <br/>
+              <ContinueButton next={nextTrial} />
+            </div>
+          </div>) : null
 
       return (
-        <div>
-          {screen}          
-          {nextButton}
+        <div className="container">
+          {screen}
+          {button}
         </div>
       );
     }
     else {
-      return <div>Loading...</div>;
+      return <LoadingScreen />;
     }
   }
 }
@@ -180,12 +195,8 @@ const InfoBeforeLessonPartC = props => {
     info = <p>בחלק זה תשמעו אקורדים בודדים משני הסוגים ששמעתם קודם לכן - בפסנתר ובגיטרה.</p>;
     break;
   };
-  return (
-    <div className="InfoBeforeLessonPartC">
-      { info }
-      <button onClick={next}>{Strings.continue_text}</button>
-    </div>
-  );
+
+  return <InfoScreen info={info} next={next}/>;
 };
 
 // The main lesson block component.
@@ -198,43 +209,56 @@ export class LessonBlock extends React.Component {
     DONE: 5,
   }
 
+  state = {
+    step: 1,
+  }
+
   nextStep = () => {
     const { step } = this.state;
 
     this.setState({
       step: step + 1
     });
+    ls.set("lesson_block_step", step + 1);
+
     if (step + 1 === this.steps.DONE)
       this.next();
   }
-
-  state = {
-    step: 1,
-  };
   
-  constructor({data, lesson_type, next}) {
+  constructor({data, session, next}) {
     super();
     this.data = data;
-    this.lesson_type = lesson_type;
+    this.session = session;
     this.next = next;
+
+    if (session.continued) {
+      this.state.step = ls.get("lesson_block_step", this.state.step);
+    }
+    else {
+      ls.set("lesson_block_step", this.state.step);
+    }
   }
   
   render() {
     const {step} = this.state;
     let screen;
+    console.log("step=" + step);
     switch(step) {
     case this.steps.PART_A:
-      screen = <LessonPart part={0} lesson_type={this.lesson_type} next={this.nextStep} key={step} />;
+      screen = <LessonPart part={0} session={this.session} next={this.nextStep} key={step} />;
       break;
     case this.steps.PART_B:
-      screen = <LessonPart part={1} lesson_type={this.lesson_type} next={this.nextStep} key={step} />;
+      screen = <LessonPart part={1} session={this.session} next={this.nextStep} key={step} />;
       break;
     case this.steps.INFO:
-      screen = <InfoBeforeLessonPartC lesson_type={this.lesson_type} next={this.nextStep} key={step} />;
+      this.session.continued = false;
+      screen = <InfoBeforeLessonPartC lesson_type={this.session.lesson_type} next={this.nextStep} key={step} />;
       break;
     case this.steps.PART_C:
-      screen = <LessonPart part={2} lesson_type={this.lesson_type} next={this.nextStep} key={step} />;
+      screen = <LessonPart part={2} session={this.session} next={this.nextStep} key={step} />;
       break;
+    case this.steps.DONE:
+      this.nextStep();
     }
 
     return screen;

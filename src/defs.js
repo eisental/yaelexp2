@@ -11,22 +11,27 @@ export const Chords = {
   HALF_DIM:"חצי מוקטן"
 }
 
+export const Timbres = {
+  PIANO: 0,
+  GUITAR: 1,
+}
+
 export const StaticImages = {
   happySmiley: "/static_images/happySmiley.jpg",
   sadSmiley: "/static_images/sadSmiley.png",
 }
 
 export const Strings = {
-  continue_text: "הבא",
+  continue_text: "המשך",
   success_identification: "בחרת באקורד הנכון",
   failure_identification: "בחרת באקורד הלא נכון",
-  how_it_sounds: " כך הוא נשמע",
+  how_it_sounds: "כך הוא נשמע",
   failure_song_has_chord:"בשיר יש אקורד ",
 };
 
 export const SheetNames = {
   TRAINING_SESSIONS: "TrainingSessions",
-  TRAINING_DATA: "TrainingExperiment",
+  LESSON_TYPES: "LessonTypes",
 }
 
 // For MUSICAL_CONTEXT lessons. A mapping of chord name to the image and song name that goes with it.

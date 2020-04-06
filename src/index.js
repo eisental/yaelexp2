@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import 'bootstrap/dist/css/bootstrap.css';
 import './index.css';
 import TrainingExperiment from './training_experiment/TrainingExperiment.js';
 import * as serviceWorker from './serviceWorker';

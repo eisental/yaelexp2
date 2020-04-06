@@ -17,6 +17,7 @@ const serialize = function(obj, prefix) {
         encodeURIComponent(k) + "=" + encodeURIComponent(v));
     }
   }
+  console.log("serialize: " + str.join("&"));
   return str.join("&");
 }
 
@@ -39,16 +40,20 @@ const gs = {
   },
 
   write: function(conn, sheetName, data) {
-    let url = conn.write_url + "?" + serialize(data) + "&sheet_name=" + sheetName;
+    if (!Array.isArray(data))
+        data = [data];
+
+    let url = conn.write_url + "?sheet_name=" + sheetName;
     return fetch(url,
                  {
                    headers: {
                      'Accept': 'application/json',
                      'Content-Type': 'application/json'
                    },
-                   method: "GET",
+                   method: "POST",
                    mode: 'no-cors',
-                 })    
+                   body: JSON.stringify(data),
+                 });
   },
 
   list_sheets: function(conn) {
@@ -56,6 +61,6 @@ const gs = {
       .then(res => res.json())
       .then(parse_sheet_list);
   },
-}
+};
 
 export default gs;

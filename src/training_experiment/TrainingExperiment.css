@@ -1,25 +1,16 @@
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
 .successScreenWrapper{
-  margin-top: 15%;
+  margin-top: 10%;
 }
 
 .songDisplayWrapper{
-  margin-top:1%;
+  margin-top: 1%;
 }
 
 .chordBtn{
   background-color:  #e7e7e7;; 
   border: 1px black solid;
   color: black;
-  padding: 20px 35px;
+  padding: 25px;
   margin-left: 5%;
   text-align: center;
   text-decoration: none;
@@ -27,21 +18,29 @@
   font-size: 16px;
 }
 
+.chordBtn:disabled {
+  color: darkgray;
+}
+
+.chordBtn p {
+    margin-bottom: 0;
+}
+
 .songImage{
-  width:170px;
-  height:170px;
   float:right;
 }
 
 .songTitleWrapper{
   float:right;
   width: 40%;
-  margin-right: 5%;
-  margin-top: 2%;
 }
 
 .songTitle{
   font-size: 40px;
+}
+
+.sadSmiley {
+  float: left;
 }
 
 .chordName{
@@ -53,29 +52,20 @@
   clear:both;
 }
 
-.fixToRight{
-  margin-left: 10%;
-}
-
 .chords{
   margin-top:10px;
 }
 
 .plusSign{
-  font-size: 100px;
+  font-size: 120px;
+  font-weight: 100;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.infotext {
+  line-height: 170%;
 }
 
-.App-link {
-  color: #61dafb;
+.infotext p {
+  margin-top: 2%;
+  margin-bottom: 0.5em;
 }
