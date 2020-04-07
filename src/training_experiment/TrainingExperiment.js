@@ -95,14 +95,11 @@ class TrainingExperiment extends React.Component {
     // or enforce session limits.
     let session = {id: this.data.id};
     const previous_sessions = this.sessions.filter(e => e.id === session.id);
-    console.log("previous_session:");
-    console.log(previous_sessions);
     if (previous_sessions.length === 0) {
       // First session
       ls.clear();
       session.number = 0;
       this.setState({did_load_lesson_type: false});
-      console.log("call readLessontype");
       readLessonType(this.conn, session.id)
         .then(lesson_type => {
           if (lesson_type === -1)
@@ -111,7 +108,6 @@ class TrainingExperiment extends React.Component {
                            did_load_lesson_type: true});
           else {
             session.lesson_type = lesson_type;
-            console.log("loaded lesson_type: " + lesson_type);
             writeSessionEvent(this.conn, session, 
                               SessionEvent.SESSION_START);
             
@@ -134,26 +130,19 @@ class TrainingExperiment extends React.Component {
           // Same day. Try to continue the last session.
           session.number = last_session_number;
           // Retreive session and data from local storage. <== TODO: deal with missing values.
+          console.log("Loading session data from local storage.");
           const continued_session = ls.get('session');
-          console.log("continued_session:");
-          console.log(continued_session);
           if (continued_session && continued_session.id === session.id) {
             writeSessionEvent(this.conn, session, 
                               SessionEvent.SESSION_CONTINUED, this.sessionEventError);
-            
-            console.log("Loading session data from local storage.");
             session = continued_session;
             const continued_data = ls.get('data');
-            console.log("continued_data:");
-            console.log(continued_data);
             if (continued_data) {
               console.log("Loading experiment data from local storage.");
               this.data = continued_data;
             }
             
             const continued_step = ls.get('step');
-            console.log("continued_step:");
-            console.log(continued_step);
             
             session.continued = true;
             this.setState({step: continued_step || this.steps.INFO,
@@ -300,8 +289,6 @@ class TrainingExperiment extends React.Component {
 
   getScreenForStep(step) {
     let screen;
-    console.log("session: ");
-    console.log(this.state.session);
     {
       switch(step) {
       case this.steps.INTRO:

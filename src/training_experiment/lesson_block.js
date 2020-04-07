@@ -1,7 +1,7 @@
 import React from 'react';
 import { musical_pieces_data, LessonType, Strings, Chords } from '../defs.js';
 import { AudioController } from '../audio_controller.js';
-import { InfoScreen, SongHeader, LoadingScreen, ContinueButton } from '../ui.js';
+import { InfoScreen, LoadingScreen, ContinueButton } from '../ui.js';
 import { randomSequence } from '../randomize.js';
 import ls from 'local-storage';
 
@@ -54,20 +54,20 @@ const SongWithoutChords = props => {
   let { chordName } = props;
   let { songData } = props;
   return(
-    <div>
-      <SongHeader songData={ songData } />
-      <div className="row"><div className="col-sm-12">&nbsp;</div></div>
-      <div className="row"><div className="col-sm-12">&nbsp;</div></div>
+    <div className="songDisplayWrapper">
+      <img className="songImage" src={ songData.imgSrc } alt=""/>
       <div className="row">
-        <div className="col-sm-4 offset-sm-4 text-center">
-          <span className="songTitle">
-          שם האקורד:
-          </span>
-        </div>
-      </div>
-      <div className="row text-center">
-        <div className="col-sm-4 offset-sm-4">
-          <span className="songTitle fixToRight">{ chordName }</span>
+        <div className="col text-center">
+          <div className="songTitle">
+            שם השיר:
+            <br/>
+            { songData.name }
+            <br/>
+            <br/>
+            שם האקורד:
+            <br/>
+            { chordName }
+          </div>
         </div>
       </div>
     </div>
@@ -150,7 +150,7 @@ class LessonPart extends React.Component {
     const trialData  = this.sequence[this.state.trial_idx];
     const chordName = trialData[1];
     const songData = musical_pieces_data[chordName];
-    console.log("rendering part " + this.part + " trial " + this.state.trial_idx);
+
     if (this.state.done_loading) {
       let screen;
       if (this.session.lesson_type === LessonType.MUSICAL_PIECES) {
@@ -246,7 +246,7 @@ export class LessonBlock extends React.Component {
   render() {
     const {step} = this.state;
     let screen;
-    console.log("step=" + step);
+
     switch(step) {
     case this.steps.PART_A:
       screen = <LessonPart part={0} session={this.session} next={this.nextStep} key={step} />;

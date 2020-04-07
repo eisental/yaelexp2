@@ -1,7 +1,7 @@
 import React from 'react';
 import { AudioController } from '../audio_controller.js';
 import { LessonType, Strings, StaticImages, Chords, Timbres, musical_pieces_data } from '../defs.js';
-import { SongHeader, InfoScreen, LoadingScreen, ContinueButton } from '../ui.js';
+import { InfoScreen, LoadingScreen, ContinueButton } from '../ui.js';
 import { randomSequence, shuffleArray } from '../randomize.js';
 import ls from 'local-storage';
 
@@ -238,16 +238,19 @@ const SongWithChords = props => {
 
   return (
     <div className="songDisplayWrapper">
-      <SongHeader songData = { songData} />
-      <div className="row"><div className="col-sm-12">&nbsp;</div></div>
-      <div className="row"><div className="col-sm-12">&nbsp;</div></div>
+      <img className="songImage" src={ songData.imgSrc } alt=""/>
       <div className="row">
-        <div className="col-sm-4 offset-sm-4 text-center songTitle">
-          שם האקורד:
+        <div className="col text-center songTitle">
+          שם השיר:
+          <br/>
+          { songData.name }
+          <br/>
+          <br/>
+          שם האקורד:          
         </div>
       </div>
       <div className="row">
-        <div className="col-sm-8 offset-sm-2 chords">
+        <div className="col text-center chords">
           {chord_buttons.map((chord, i) => gen_button(chord, i))}
         </div>
       </div>
@@ -333,9 +336,7 @@ class TrainingPart extends React.Component {
     if (session.continued) {
       this.sequence = ls.get(this.ls_prefix + "sequence");
       const trial_idx = ls.get(this.ls_prefix + "trial_idx");
-      console.log("trial_idx:" + trial_idx + "," + this.state.trial_idx);
       if (trial_idx !== null) this.state.trial_idx = trial_idx;
-      console.log("trial_idx:" + trial_idx + "," + this.state.trial_idx);
       session.continued = false; // we only need to restore session once!
     }
     else {
@@ -354,10 +355,7 @@ class TrainingPart extends React.Component {
 
     const donePlaying = () => {
       that.setState({done_playing: true});
-
-      // play the next audio idx in case the user made a mistake (Failedidentification)
-      console.log("doneplaying");
-      console.log(this.state);
+      this.response_start = new Date();
       
       // this part runs when we give feedback for an incorrect answer.
       if (this.state.show_feedback) {
@@ -424,10 +422,9 @@ class TrainingPart extends React.Component {
         transposition_play_count: that.get_transposition_play_count(),
         selected_chord_type: answer,
         correct: correct,
+        response_time: new Date() - that.response_start,
       };
       that.data.trials.push(td);
-      console.log("SAVING DATA");
-      console.log(that.data);
       ls.set("data", that.data);
       if (this.state.trial_idx+1 < this.trials_per_part)
         ls.set(this.ls_prefix + "trial_idx", this.state.trial_idx+1);
@@ -439,7 +436,7 @@ class TrainingPart extends React.Component {
         const selected_audio_idx = that.part_data.
           filter(d => d[1] === answer && d[2] === transposition && d[3] === trial_data[3])[0][0];
         const correct_audio_idx = trial_data[0];
-        console.log("selected_audio_idx=" + selected_audio_idx + " correct_audio_idx=" + correct_audio_idx);
+
         this.setState({show_feedback: true,
                        correct: correct,
                        fail_show_correct: false,
@@ -452,7 +449,6 @@ class TrainingPart extends React.Component {
       }
     };
     
-    console.log("rendering part " + this.part + " trial " + this.state.trial_idx);
     if (!this.state.done_loading) 
       return <LoadingScreen />;
 
@@ -478,7 +474,6 @@ class TrainingPart extends React.Component {
       );
     }
     else { // show feedback screen
-      console.log("preparing feedback for correct=" + this.state.correct);
       if (this.state.correct) {
         return <SuccessfulIdentification next={nextTrial}/>;
       } else {

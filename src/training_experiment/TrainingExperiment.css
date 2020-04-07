@@ -4,6 +4,8 @@
 
 .songDisplayWrapper{
   margin-top: 1%;
+  margin-left: 0;
+  maring-right: 0;
 }
 
 .chordBtn{
@@ -16,6 +18,7 @@
   text-decoration: none;
   display: inline-block;
   font-size: 16px;
+  border-radius: 5px;
 }
 
 .chordBtn:disabled {
@@ -26,13 +29,17 @@
     margin-bottom: 0;
 }
 
-.songImage{
-  float:right;
+@media (min-width: 992px) {
+    .songImage {
+        padding-right: 15%;
+    }
 }
 
-.songTitleWrapper{
-  float:right;
-  width: 40%;
+.songImage{
+    float: right;
+    position: absolute;
+    white-space: nowrap;
+    overflow-x: auto;
 }
 
 .songTitle{

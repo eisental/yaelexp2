@@ -10,7 +10,7 @@ export class AudioController {
       const playerIdx = this.players.length;
       this.ids2players[id] = playerIdx;
       this.players2ids[playerIdx] = id;
-      console.log("adding:" + id + " to player " + this.players.length);
+
       const p = new Audio(audioIdx2File(id));
       p.addEventListener('canplaythrough', (e => {this.audioLoaded(p)}), false);
       p.addEventListener('ended', (e => {
@@ -26,7 +26,6 @@ export class AudioController {
   }
 
   audioLoaded(player) {
-    console.log("loaded audio:" + player.src);
     this.loadCount+=1;
     if (this.loadCount === this.players.length) {
       if (this.onDoneLoading) this.onDoneLoading();
@@ -35,7 +34,6 @@ export class AudioController {
 
   play(audio_id) {
     const playerIdx = this.ids2players[audio_id];
-    console.log("playing " + audio_id + " on player " + playerIdx);
     this.players[playerIdx].play();
   }
 }
