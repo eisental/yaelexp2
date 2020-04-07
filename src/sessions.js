@@ -30,8 +30,6 @@ export const writeSessionEvent = (conn, session, event, on_error) => {
   let request_data = Object.assign({event: event,
                                     time: new Date().toString()},
                                     session);
-  console.log("writing session_data");
-  console.log(request_data);
   ls.set('session', session);
   gs.write(conn, SheetNames.TRAINING_SESSIONS, request_data)
     .catch(on_error);
@@ -47,7 +45,6 @@ export const readSessionData = (conn) => {
 
 export const readLessonType = (conn, id) => {
   const findLessonType = (data) => {
-    console.log("findLessontype");
     let lesson_type = -1;
     data.values.forEach(row => {
       if (row[0] === id)
@@ -55,7 +52,7 @@ export const readLessonType = (conn, id) => {
     });    
     return lesson_type;
   }
-  console.log("readLessontype: " + id);
+
   return gs.read(conn, SheetNames.LESSON_TYPES, "A2:B10000")
     .then(response => response.json())
     .then(findLessonType)

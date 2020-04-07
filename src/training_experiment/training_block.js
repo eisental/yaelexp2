@@ -304,7 +304,7 @@ const ChordSelection = props => {
 
 class TrainingPart extends React.Component {
   state = {
-    trial_idx: 31,
+    trial_idx: 0,
     done_loading: false,
     done_playing: false,
     show_feedback: false,
@@ -378,16 +378,9 @@ class TrainingPart extends React.Component {
   get_transposition_play_count() { 
     const idx = this.state.trial_idx;
     const trial = this.sequence[idx];
-    console.log("trial idx:" + idx + " trial: " + trial);
-    console.log("slice:");
-    console.log(this.sequence.slice(0, idx));
-    console.log("filter:");
-    console.log(this.sequence.slice(0, idx)
-                .filter(t => t[1] === trial[1] && t[2] === trial[2]));
     const count_in_part = this.sequence.slice(0, idx)
       .filter(t => t[1] === trial[1] && t[2] === trial[2]).length + 1;
-    console.log("count_in_part: " + count_in_part);
-    return count_in_part; // TODO: return actual transposition count (not in part)
+    return count_in_part;
   }
 
   render() {
@@ -410,7 +403,6 @@ class TrainingPart extends React.Component {
     };
 
     const processAnswer = (answer) => {
-      console.log("SELECTION: " + answer);
       const correct = answer === chord_name;
       // save trial data
       const td = {

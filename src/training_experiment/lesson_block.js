@@ -78,7 +78,7 @@ const SongWithoutChords = props => {
 // between them is the audio sequence. Audio playing code is here.
 class LessonPart extends React.Component {
   state = {
-    trial_idx: 15,
+    trial_idx: 0,
     done_playing: false,
     done_loading: false,
   };
