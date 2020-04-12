@@ -36,4 +36,10 @@ export class AudioController {
     const playerIdx = this.ids2players[audio_id];
     this.players[playerIdx].play();
   }
+
+  stop(audio_id) {
+    const playerIdx = this.ids2players[audio_id];
+    this.players[playerIdx].pause();
+    this.players[playerIdx].currentTime = 0;
+  }
 }

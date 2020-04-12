@@ -47,11 +47,11 @@ function StartScreen({next, lesson_type}) {
 }
 
 function FinishScreen({data, done_saving, session_number}) {
-  const remaining = MAX_NUMBER_OF_SESSIONS - session_number - 1;
+  const remaining = MAX_NUMBER_OF_SESSIONS - session_number;
   return (
     <div className="container">
       <div className="col-md-8 offset-md-2">
-        <p>הפעלה מספר {session_number+1} הסתיימה. נותרו עוד {remaining} הפעלות.</p>
+        <p>הפעלה מספר {session_number} הסתיימה. נותרו עוד {remaining} הפעלות.</p>
         <p>{done_saving ? "הנתונים נשמרו בהצלחה!" : "אנא המתן לשמירת הנתונים..."}</p>
       </div>
     </div>
@@ -98,7 +98,7 @@ class TrainingExperiment extends React.Component {
     if (previous_sessions.length === 0) {
       // First session
       ls.clear();
-      session.number = 0;
+      session.number = 1;
       this.setState({did_load_lesson_type: false});
       readLessonType(this.conn, session.id)
         .then(lesson_type => {
@@ -160,7 +160,7 @@ class TrainingExperiment extends React.Component {
         else {
           // A new day. TODO: what happens when max session reached on unfinished session?
           ls.clear();
-          if (last_session_number + 1 >= MAX_NUMBER_OF_SESSIONS) {
+          if (last_session_number >= MAX_NUMBER_OF_SESSIONS) {
             // enforce the session limit.
             this.setState({max_sessions_reached: true,
                            session: session});
@@ -178,7 +178,7 @@ class TrainingExperiment extends React.Component {
       else {
         // The last session was finished. 
         ls.clear();
-        if (last_session_number + 1 >= MAX_NUMBER_OF_SESSIONS) {
+        if (last_session_number >= MAX_NUMBER_OF_SESSIONS) {
           // enforce the session limit.
           this.setState({max_sessions_reached: true,
                          session: session});

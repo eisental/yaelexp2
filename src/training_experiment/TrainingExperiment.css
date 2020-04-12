@@ -8,16 +8,22 @@
   maring-right: 0;
 }
 
+.chordSelection {
+    margin-top: 5%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .chordBtn{
   background-color:  #e7e7e7;; 
   border: 1px black solid;
   color: black;
-  padding: 25px;
-  margin-left: 5%;
+  width: 170px;
+  height: 110px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
-  font-size: 16px;
+  font-size: 20px;
   border-radius: 5px;
 }
 
@@ -27,6 +33,12 @@
 
 .chordBtn p {
     margin-bottom: 0;
+}
+
+.plusSign{
+  font-size: 120px;
+  font-weight: 100;
+  padding: 50px 100px 50px 100px;
 }
 
 @media (min-width: 992px) {
@@ -44,10 +56,11 @@
 
 .songTitle{
   font-size: 40px;
+  overflow: hidden;
 }
 
 .sadSmiley {
-  float: left;
+    align-self: right;
 }
 
 .chordName{
@@ -63,9 +76,17 @@
   margin-top:10px;
 }
 
-.plusSign{
-  font-size: 120px;
-  font-weight: 100;
+.chordsTable {
+  width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0;
+  display: flex;
+}
+
+.chords .chordBtn {
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
 .infotext {

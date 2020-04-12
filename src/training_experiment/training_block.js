@@ -183,45 +183,43 @@ const SuccessfulIdentification = props => {
   );
 };
 
-const ShowCorrectAnswer = props => {
-  const { correctChord } = props;
-  return (
-    <div>
-      <div className="row">
-        <div className="col-sm-8 offset-sm-1">
-          <span className="songTitle">{ Strings.failure_song_has_chord } </span>
-          <span className="songTitle">{ correctChord }</span>
-          <br/>
-          <span className="songTitle">{ Strings.how_it_sounds }</span>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 const FailedIdentification = props => {
-  const { shouldShowCorrect, correctChord} = props;
+  const { shouldShowCorrect, shouldShowButton, correctChord, lesson_type, part, next} = props;
 
-  let appendix = <div></div>;
+  let appendix;
+
   if (shouldShowCorrect === true){
+    const button = shouldShowButton ? <ContinueButton next={next} /> : null;
+    let text;
+    if (part === 2 || lesson_type === LessonType.AUTOMATIC) text = "האקורד שהושמע הוא אקורד ";
+    else if (lesson_type === LessonType.MUSICAL_PIECES) text = "בשיר יש אקורד ";
+    else text = "בהקלטה יש אקורד ";
+    
     appendix = 
-      <div className="row">
-        <div className="col-sm-8 offset-sm-2 text-center">
-          <ShowCorrectAnswer correctChord={ correctChord } />
-        </div>
+      <div>
+        <span className="songTitle">{ text } </span>
+        <span className="songTitle">{ correctChord }</span>
+        <br/>
+        <span className="songTitle">{ Strings.how_it_sounds }</span>
+        <br/>
+        <br/>
+        {button}
       </div>;
-  }
+  } else appendix = null;
+
   return (
-    <div>
+    <div className="container">
       <div className="row">
-        <div className="col-sm-8 offset-sm-2 text-center">
-            <img src= { StaticImages.sadSmiley } width="150px" height="150px" alt="" className="sadSmiley"/>
+        <div className="col-sm-9 offset-sm-1 text-center">
             <span className="songTitle"> { Strings.failure_identification } &nbsp;</span>
             <br/>
             <span className="songTitle">{ Strings.how_it_sounds }</span>
+            { appendix }
+        </div>
+        <div className="col-sm-2">
+          <img src= { StaticImages.sadSmiley } width="150px" height="150px" alt="" className="sadSmiley"/>
         </div>
       </div>
-      { appendix }
     </div>
   );
 };
@@ -231,9 +229,9 @@ const SongWithChords = props => {
 
   const gen_button = (chord, i) => {
     if (disabled) 
-      return <button className="chordBtn" disabled key={i} onClick={(e) => next(chord)}>{chord}</button>;
+      return <td><button className="chordBtn" disabled key={i} onClick={(e) => next(chord)}>{chord}</button></td>;
     else 
-      return <button className="chordBtn" key={i} onClick={(e) => next(chord)}>{chord}</button>;
+      return <td><button className="chordBtn" key={i} onClick={(e) => next(chord)}>{chord}</button></td>;
   };
 
   return (
@@ -246,12 +244,17 @@ const SongWithChords = props => {
           { songData.name }
           <br/>
           <br/>
-          שם האקורד:          
+          שם האקורד:
         </div>
+
       </div>
-      <div className="row">
+      <div className="row chordsTable text-center">
         <div className="col text-center chords">
-          {chord_buttons.map((chord, i) => gen_button(chord, i))}
+          <table className="chordsTable text-center">
+            <tr>
+              {chord_buttons.map((chord, i) => gen_button(chord, i))}
+            </tr>
+          </table>
         </div>
       </div>
     </div>
@@ -270,17 +273,35 @@ const ChordSelection = props => {
   };
 
   return (
+    <table className="chordSelection">
+      <tr>
+        <td>{gen_button(chord_buttons[0])}</td>
+        <td></td>
+        <td>{gen_button(chord_buttons[1])}</td>
+      </tr>
+        <td></td>
+        <td className="plusSign align-middle">+</td>
+        <td></td>
+      <tr>
+        <td>{gen_button(chord_buttons[2])}</td>
+        <td></td>
+        <td>{gen_button(chord_buttons[3])}</td>
+      </tr>
+    </table>
+  );
+  return (
     <div className="songDisplayWrapper">
       <div className="row">
         <div className="col-sm-2 offset-sm-2">
-          {gen_button(chord_buttons[0])}
+          
         </div>
         <div className="col-sm-4">
           &nbsp;
         </div>
         <div className="col-sm-2">
-          {gen_button(chord_buttons[1])}
+          
         </div>
+        <div className="col-sm-2">&nbsp;</div>
       </div>
       <div className="row text-center">
         <div className="col-sm-2 offset-sm-5 plusSign align-middle">
@@ -289,13 +310,13 @@ const ChordSelection = props => {
       </div>
       <div className="row">
         <div className="col-sm-2 offset-sm-2">
-          {gen_button(chord_buttons[2])}
+          
         </div>
         <div className="col-sm-4">
           &nbsp;
         </div>
         <div className="col-sm-2">
-          {gen_button(chord_buttons[3])}
+          
         </div>
       </div>
     </div>
@@ -355,7 +376,6 @@ class TrainingPart extends React.Component {
 
     const donePlaying = () => {
       that.setState({done_playing: true});
-      this.response_start = new Date();
       
       // this part runs when we give feedback for an incorrect answer.
       if (this.state.show_feedback) {
@@ -363,15 +383,15 @@ class TrainingPart extends React.Component {
           // play the correct answer audio idx
           this.audioController.play(this.state.correct_audio_idx);
           this.setState({fail_show_correct: true});
-        }
-        else {
-          // continue 
-          this.nextTrial();
+        } else {
+          // done playing feedback, show continue button.
+          this.setState({done_playing_correct_feedback: true});
         }
       }
     };
 
     this.audioController = new AudioController(this.part_data.map(d => d[0]), doneLoadingAudio, donePlaying);
+    this.response_start = new Date();
   }
 
   /* calculate the transposition count since the beginning of training (currently of part). */
@@ -396,6 +416,7 @@ class TrainingPart extends React.Component {
                        done_playing: false,
                        show_feedback: false});
         that.audioController.play(this.sequence[trial_idx+1][0]);
+        that.response_start = new Date(); // RT measurement
       }
       else {
         that.next();
@@ -421,6 +442,9 @@ class TrainingPart extends React.Component {
       if (this.state.trial_idx+1 < this.trials_per_part)
         ls.set(this.ls_prefix + "trial_idx", this.state.trial_idx+1);
 
+      // stop playback
+      that.audioController.stop(trial_data[0]);
+
       // continue to show answer feedback
       if (!correct) {
         // start playing the chosen chord and then the right chord.
@@ -432,6 +456,7 @@ class TrainingPart extends React.Component {
         this.setState({show_feedback: true,
                        correct: correct,
                        fail_show_correct: false,
+                       done_playing_correct_feedback: false,
                        correct_audio_idx: correct_audio_idx});
         that.audioController.play(selected_audio_idx);
       }
@@ -448,13 +473,11 @@ class TrainingPart extends React.Component {
       let screen;
       if (this.part < 2 && this.session.lesson_type === LessonType.MUSICAL_PIECES) {
         const song_data = musical_pieces_data[chord_name];
-        screen = <SongWithChords songData={song_data} disabled={!this.state.done_playing} 
-                                 chord_buttons={this.chord_buttons} next={processAnswer}/>;
+        screen = <SongWithChords songData={song_data} chord_buttons={this.chord_buttons} next={processAnswer}/>;
       }
       else {
         screen = <ChordSelection 
         chord_buttons={this.chord_buttons} 
-        disabled={!this.state.done_playing} 
         with_song_names={this.session.lesson_type === LessonType.MUSICAL_PIECES}
         next={processAnswer}/>;
       }
@@ -470,7 +493,7 @@ class TrainingPart extends React.Component {
         return <SuccessfulIdentification next={nextTrial}/>;
       } else {
         this.nextTrial = nextTrial;
-        return <FailedIdentification shouldShowCorrect={this.state.fail_show_correct} correctChord={chord_name} />;
+        return <FailedIdentification shouldShowCorrect={this.state.fail_show_correct} shouldShowButton={this.state.done_playing_correct_feedback} correctChord={chord_name} lesson_type={this.session.lesson_type} next={nextTrial} part={this.part}/>;
       }
     }
   }

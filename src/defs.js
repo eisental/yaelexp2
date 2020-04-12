@@ -26,7 +26,6 @@ export const Strings = {
   success_identification: "בחרת באקורד הנכון",
   failure_identification: "בחרת באקורד הלא נכון",
   how_it_sounds: "כך הוא נשמע",
-  failure_song_has_chord:"בשיר יש אקורד ",
 };
 
 export const SheetNames = {
