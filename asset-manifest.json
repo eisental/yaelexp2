@@ -1,22 +1,22 @@
 {
   "files": {
-    "main.css": "/yaelexp2/static/css/main.58e19383.chunk.css",
-    "main.js": "/yaelexp2/static/js/main.969b0a27.chunk.js",
-    "main.js.map": "/yaelexp2/static/js/main.969b0a27.chunk.js.map",
+    "main.css": "/yaelexp2/static/css/main.2e5a69a7.chunk.css",
+    "main.js": "/yaelexp2/static/js/main.df426f28.chunk.js",
+    "main.js.map": "/yaelexp2/static/js/main.df426f28.chunk.js.map",
     "runtime-main.js": "/yaelexp2/static/js/runtime-main.528fb7db.js",
     "runtime-main.js.map": "/yaelexp2/static/js/runtime-main.528fb7db.js.map",
     "static/js/2.350ba157.chunk.js": "/yaelexp2/static/js/2.350ba157.chunk.js",
     "static/js/2.350ba157.chunk.js.map": "/yaelexp2/static/js/2.350ba157.chunk.js.map",
     "index.html": "/yaelexp2/index.html",
-    "precache-manifest.dea2cb47c21f3fa7068219c5709f2293.js": "/yaelexp2/precache-manifest.dea2cb47c21f3fa7068219c5709f2293.js",
+    "precache-manifest.66af78df0755e12203ae6ad41f03184a.js": "/yaelexp2/precache-manifest.66af78df0755e12203ae6ad41f03184a.js",
     "service-worker.js": "/yaelexp2/service-worker.js",
-    "static/css/main.58e19383.chunk.css.map": "/yaelexp2/static/css/main.58e19383.chunk.css.map",
+    "static/css/main.2e5a69a7.chunk.css.map": "/yaelexp2/static/css/main.2e5a69a7.chunk.css.map",
     "static/js/2.350ba157.chunk.js.LICENSE": "/yaelexp2/static/js/2.350ba157.chunk.js.LICENSE"
   },
   "entrypoints": [
     "static/js/runtime-main.528fb7db.js",
     "static/js/2.350ba157.chunk.js",
-    "static/css/main.58e19383.chunk.css",
-    "static/js/main.969b0a27.chunk.js"
+    "static/css/main.2e5a69a7.chunk.css",
+    "static/js/main.df426f28.chunk.js"
   ]
 }
