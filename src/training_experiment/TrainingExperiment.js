@@ -185,7 +185,7 @@ class TrainingExperiment extends React.Component {
           }
 
         })
-        .catch(err => { console.log("error while reading lessons: " + err); });
+        .catch(err => { alert("Error while reading lessons: " + err); });
     }
     else {
       // Not first session
@@ -198,7 +198,7 @@ class TrainingExperiment extends React.Component {
         if (was_last_session_today(last_session)) {
           // Same day. Try to continue the last session.
           session.number = last_session_number;
-          // Retreive session and data from local storage. <== TODO: deal with missing values.
+          // Retreive session and data from local storage.
           console.log("Loading session data from local storage.");
           const continued_session = ls.get('session');
           if (continued_session && continued_session.id === session.id) {
@@ -215,16 +215,25 @@ class TrainingExperiment extends React.Component {
             
             session.continued = true;
             this.setState({step: continued_step || this.steps.INFO,
-                           session: session});            
+                           session: session});
+            this.stepChanged(continued_step);
           } 
           else {
-            // MUST ENFORCE LIMITS HERE!
-            // Can't continue session. Start a new one. 
+            // Can't continue session. Start a new one if possible. 
             ls.clear();
-            session.number = last_session_number + 1;
-            writeSessionEvent(this.conn, session, 
-                              SessionEvent.SESSION_START);
+            if (last_session_number >= MAX_NUMBER_OF_SESSIONS) {
+              // enforce the session limit.
+              this.setState({max_sessions_reached: true,
+                             session: session});
+            } 
+            else {
+              // Continue to next session. 
+              // TODO: should this automatically add another lesson? or just use the same session number?
+              session.number = last_session_number + 1;
+              writeSessionEvent(this.conn, session, 
+                                SessionEvent.SESSION_START);
             this.setState({session: session});
+            }            
           }
         }
         else {
@@ -339,11 +348,11 @@ class TrainingExperiment extends React.Component {
   }
 
   dataSaveError = (response) => {
-    console.log("error" + response);
+    alert("Error: " + response);
   }
 
   sessionEventError = (response) => { // TODO
-    console.log("error while writing session event.");
+    alert("Error while writing session event.");
   }
 
   sessionDataLoaded = (session_data) => {
@@ -353,7 +362,7 @@ class TrainingExperiment extends React.Component {
 
   sessionDataLoadError = (response) => { // TODO
     // ask to refresh the page, try again... contact info?
-    console.log("Session data load error: " + response);
+    alert("Session data load error: " + response);
   }
 
   componentDidMount() {
@@ -362,7 +371,7 @@ class TrainingExperiment extends React.Component {
     
     readSessionData(this.conn)
       .then(that.sessionDataLoaded)
-      .catch(that.sessionDataLoadError); // TODO: handle errors!
+      .catch(that.sessionDataLoadError);
 
     this.data.start_time = new Date().toString();
   }
