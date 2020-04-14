@@ -1,18 +1,19 @@
 import React from 'react';
 import './TrainingExperiment.css';
-import { IntroText, InfoText } from './info.js';
+import { IntroText, InfoText, PretestInfo } from './info.js';
 import { LessonType, Strings } from '../defs.js';
 import { LessonBlock } from './lesson_block.js';
 import { TrainingBlock } from './training_block.js';
-import { InfoScreen, LoadingScreen, ErrorScreen, ContinueButton } from '../ui.js';
+import { InfoScreen, LoadingScreen, ErrorScreen, ContinueButton, ButtonTable } from '../ui.js';
 import { does_user_sheet_exists, was_last_session_today, SessionEvent, writeSessionEvent, readSessionData, readLessonType } from '../sessions.js';
+import { randomSequence } from '../randomize.js';
 import gs from '../spreadsheet_io.js';
 import ls from 'local-storage';
 
 const MAX_NUMBER_OF_SESSIONS = 5;
 
 // 1st screen.
-function IntroScreen({next, data}) {
+const IntroScreen = ({next, data}) => {
   function handleContinue() {
     data.id = document.getElementById('id_input').value;
     next();
@@ -38,15 +39,9 @@ function IntroScreen({next, data}) {
       </div>
     </div>
   );
-}
+};
 
-// 2nd screen. Different text per lesson type.
-function StartScreen({next, lesson_type}) {
-  const info = <InfoText lesson_type={lesson_type} />;
-  return <InfoScreen info={info} next={next}/>;
-}
-
-function FinishScreen({data, done_saving, session_number}) {
+const FinishScreen = ({data, done_saving, session_number}) => {
   const remaining = MAX_NUMBER_OF_SESSIONS - session_number;
   return (
     <div className="container">
@@ -56,7 +51,79 @@ function FinishScreen({data, done_saving, session_number}) {
       </div>
     </div>
   );
-}
+};
+
+class PretestBlock extends React.Component {
+  state = {
+    trial_idx: 0,
+  };
+
+  practice_trials_count = 8;
+  test_trails_count = 20;
+  button_idxs = [0, 1, 2, 3];
+
+  constructor({session, next, data}) {
+    super();
+    this.next = next;
+    this.data = data;
+    this.session = session;
+
+    this.ls_prefix = "pretest_";
+    if (session.continued) {
+      this.sequence = ls.get(this.ls_prefix + "sequence");
+      const trial_idx = ls.get(this.ls_prefix + "trial_idx");
+      if (trial_idx !== null) this.state.trial_idx = trial_idx;
+      session.continued = false;
+    }
+    else {
+      const practice_sequence = randomSequence(this.button_idxs, this.practice_trials_count);
+      const test_sequence = randomSequence(this.button_idxs, this.test_trails_count);
+      this.sequence = practice_sequence.concat(test_sequence);
+      ls.set(this.ls_prefix + "sequence", this.sequence);
+      ls.set(this.ls_prefix + "trial_idx", this.state.trial_idx);
+    }
+
+    console.log("Pretest sequence:");
+    console.log(this.sequence);
+    this.response_start = new Date();
+  }
+
+  render() {
+    const that = this;
+    const target_btn = this.sequence[this.state.trial_idx];
+
+    const nextTrial = (selection) => {
+      if (this.state.trial_idx+1 > this.practice_trials_count) {
+        // save trial data
+        const correct = selection === target_btn;
+        const td = {
+          time: new Date().toString(),
+          correct: correct,
+          response_time: new Date() - that.response_start,
+          session_number: 0,
+        };
+        that.data.trials.push(td);
+        ls.set("data", that.data);
+      }
+
+      if (this.state.trial_idx < that.practice_trials_count + that.test_trails_count - 1) {
+        that.setState({trial_idx: this.state.trial_idx + 1});
+        that.response_start = new Date();
+        ls.set(this.ls_prefix + "trial_idx", this.state.trial_idx+1);
+      }
+      else {
+        that.next();
+      }
+    };
+    let labels = [null, null, null, null];
+    labels[target_btn] = <div className="pretestCircle"></div>;
+    return (
+      <div className="container">
+        <ButtonTable labels={labels} values={this.button_idxs} next={nextTrial} key={this.state.trial_idx}/>
+      </div>
+    );
+  }
+};
 
 class TrainingExperiment extends React.Component {
   conn = { // read/write connection details for google spreadsheet.
@@ -68,9 +135,11 @@ class TrainingExperiment extends React.Component {
   steps = {
     INTRO: 1,
     INFO: 2, 
-    LESSON: 3,
-    TRAINING: 4,
-    FINISH: 5
+    PRETEST_INFO: 3,
+    PRETEST: 4,
+    LESSON: 5,
+    TRAINING: 6,
+    FINISH: 7
   }
 
   state = {
@@ -149,6 +218,7 @@ class TrainingExperiment extends React.Component {
                            session: session});            
           } 
           else {
+            // MUST ENFORCE LIMITS HERE!
             // Can't continue session. Start a new one. 
             ls.clear();
             session.number = last_session_number + 1;
@@ -203,16 +273,25 @@ class TrainingExperiment extends React.Component {
 
   nextStep = () => {
     const { step } = this.state;
+    let new_step;
+
+    // jump over pretest after the 1st session.
+    if (this.state.session && this.state.session.number && 
+        this.state.session.number !== 1 && (step + 1 === this.steps.PRETEST_INFO || step + 1 === this.steps.PRETEST)) 
+      new_step = this.steps.LESSON;
+    else 
+      new_step = step + 1;
+
     if (step > 1) // otherwise the key will be overwritten before loading.
-      ls.set('step', step + 1);
-    this.stepWillChange(step);
+      ls.set('step', new_step);
+    this.stepWillChange(step, new_step);
     this.setState({
-      step: step + 1
+      step: new_step
     });
-    this.stepChanged(step + 1);
+    this.stepChanged(new_step);
   }
 
-  stepWillChange = (step) => {
+  stepWillChange = (step, new_step) => {
     if (step === this.steps.INTRO) {
       does_user_sheet_exists(this.conn, this.data.id)
         .then((sheet_exists) => { 
@@ -237,7 +316,8 @@ class TrainingExperiment extends React.Component {
 
       this.data.trials.forEach(t => { 
         t.id = this.data.id;
-        t.session_number = this.state.session.number;
+        if (t.session_number === undefined)
+          t.session_number = this.state.session.number;
         t.start_time = this.data.start_time;
         t.end_time = this.data.end_time;
       });
@@ -296,7 +376,16 @@ class TrainingExperiment extends React.Component {
         break;
       case this.steps.INFO:
         this.state.session.continued = false;
-        screen = <StartScreen next={this.nextStep} lesson_type={this.state.session.lesson_type} />;
+        const info = <InfoText lesson_type={this.state.session.lesson_type} />;
+        screen = <InfoScreen info={info} next={this.nextStep}/>;
+        break;
+      case this.steps.PRETEST_INFO:
+        this.state.session.continued = false;
+        const pretest_info = <PretestInfo />;
+        screen = <InfoScreen info={pretest_info} next={this.nextStep} />;
+        break;
+      case this.steps.PRETEST:
+        screen = <PretestBlock data={this.data} next={this.nextStep} session={this.state.session} />;
         break;
       case this.steps.LESSON:
         screen = <LessonBlock data={this.data} next={this.nextStep} session={this.state.session} />;

@@ -89,6 +89,18 @@
   margin-right: 5px;
 }
 
+.pretestCircle {
+    width: 80px;
+    height: 80px;
+    border-radius: 40px;
+    margin: auto;
+    background-color: black;
+}
+
+.chordBtn:focus .pretestCircle {
+    background-color: grey;
+}
+
 .infotext {
   line-height: 170%;
 }

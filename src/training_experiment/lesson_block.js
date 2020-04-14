@@ -11,7 +11,7 @@ let lesson_data = {
   musical_pieces: [
     [[1, Chords.BIG_MAJOR], [2, Chords.SMALL_MAJOR], [3, Chords.SMALL_MINOR], [4, Chords.HALF_DIM]],
     [[5, Chords.BIG_MAJOR], [6, Chords.SMALL_MAJOR], [7, Chords.SMALL_MINOR], [8, Chords.HALF_DIM]],
-    [[9, Chords.BIG_MAJOR], [13, Chords.SMALL_MAJOR], [17, Chords.SMALL_MINOR], [21, Chords.HALF_DIM]],
+    [[1009, Chords.BIG_MAJOR], [1013, Chords.SMALL_MAJOR], [1017, Chords.SMALL_MINOR], [1021, Chords.HALF_DIM]],
   ],
   tonal_context: [
     [[25, Chords.BIG_MAJOR], [26, Chords.SMALL_MAJOR], [27, Chords.SMALL_MINOR], [28, Chords.HALF_DIM]],
@@ -78,10 +78,10 @@ const SongWithoutChords = props => {
 // between them is the audio sequence. Audio playing code is here.
 class LessonPart extends React.Component {
   state = {
-    trial_idx: 0,
+    trial_idx: 15,
     done_playing: false,
     done_loading: false,
-  };
+  }
 
   constructor({part, session, next}) {
     super();
@@ -165,7 +165,7 @@ class LessonPart extends React.Component {
               <br/>
               <ContinueButton next={nextTrial} />
             </div>
-          </div>) : null
+          </div>) : null;
 
       return (
         <div className="container">
@@ -180,7 +180,62 @@ class LessonPart extends React.Component {
   }
 }
 
-// This info screen shows up between the 2nd and 3rd parts of the lesson.
+const InfoBeforeLessonPartA = props => {
+  let { lesson_type, next } = props;
+  let info;
+  switch (lesson_type) {
+  case LessonType.MUSICAL_PIECES:
+    info = 
+      <div>
+        <p>מיד תשמעו קטעים קצרים מתוך שירים ישראליים מוכרים. בכל קטע שתשמעו, האקורד הראשון יהיה האקורד המשמעותי, אליו עליכם להתייחס.</p>
+        <p>שימו לב כי הקטעים חוזרים על עצמם מספר רב של פעמים, בכדי לאפשר לכם למידה מעמיקה. נסו להאזין היטב בכל אחת מן ההשמעות.</p>
+      </div>;
+    break;
+  case LessonType.TONAL_CONTEXT:
+    info = 
+      <div>
+        <p>מיד תשמעו צמדי אקורדים. לפני כל צמד אקורדים תשמעו מבוא טונאלי – סולם עולה ויורד. בכל צמד אקורדים שתשמעו, האקורד הראשון יהיה האקורד המשמעותי, אליו עליכם להתייחס.</p>
+        <p>שימו לב כי הקטעים חוזרים על עצמם מספר רב של פעמים, בכדי לאפשר לכם למידה מעמיקה. נסו להאזין היטב בכל אחת מן ההשמעות.</p>
+      </div>;
+    break;
+  case LessonType.AUTOMATIC:
+    info = 
+      <div>
+        <p>מיד תישמעו אקורדים. </p>
+        <p>שימו לב כי האקורדים חוזרים על עצמם מספר רב של פעמים, בכדי לאפשר לכם למידה מעמיקה. נסו להאזין היטב בכל אחת מן ההשמעות.</p>
+      </div>;
+    break;
+  };
+
+  return <InfoScreen info={info} next={next}/>;
+};
+
+const InfoBeforeLessonPartB = props => {
+  let { lesson_type, next } = props;
+  let info;
+  switch (lesson_type) {
+  case LessonType.MUSICAL_PIECES:
+    info = 
+      <p>
+      מיד תשמעו קטעים זהים לקטעים ששמעתם, אך הפעם בביצוע של חליל ופסנתר. 
+      בכל קטע שתשמעו, האקורד הראשון יהיה האקורד המשמעותי, אליו עליכם להתייחס.
+      שימו לב כי הקטעים חוזרים על עצמם מספר רב של פעמים, בכדי לאפשר לכם למידה מעמיקה. נסו להאזין היטב בכל אחת מן ההשמעות.
+      </p>;
+    break;
+  case LessonType.TONAL_CONTEXT:
+  case LessonType.AUTOMATIC:
+    info =
+      <p>
+      מיד תשמעו אקורדים זהים לאקורדים ששמעתם, אך הפעם בביצוע של גיטרה. 
+      בכל קטע שתשמעו, האקורד הראשון יהיה האקורד המשמעותי, אליו עליכם להתייחס.
+      שימו לב כי הקטעים חוזרים על עצמם מספר רב של פעמים, בכדי לאפשר לכם למידה מעמיקה. נסו להאזין היטב בכל אחת מן ההשמעות.
+      </p>;
+    break;
+  };
+
+  return <InfoScreen info={info} next={next}/>;
+};
+
 const InfoBeforeLessonPartC = props => {
   let { lesson_type, next } = props;
   let info;
@@ -202,11 +257,13 @@ const InfoBeforeLessonPartC = props => {
 // The main lesson block component.
 export class LessonBlock extends React.Component {
   steps = {
-    PART_A: 1,
-    PART_B: 2, 
-    INFO: 3,
-    PART_C: 4,
-    DONE: 5,
+    INFO_A: 1,
+    PART_A: 2,
+    INFO_B: 3,
+    PART_B: 4, 
+    INFO_C: 5,
+    PART_C: 6,
+    DONE: 7,
   }
 
   state = {
@@ -248,13 +305,21 @@ export class LessonBlock extends React.Component {
     let screen;
 
     switch(step) {
+    case this.steps.INFO_A:
+      this.session.continued = false;
+      screen = <InfoBeforeLessonPartA lesson_type={this.session.lesson_type} next={this.nextStep} key={step} />;
+      break;
     case this.steps.PART_A:
       screen = <LessonPart part={0} session={this.session} next={this.nextStep} key={step} />;
+      break;
+    case this.steps.INFO_B:
+      this.session.continued = false;
+      screen = <InfoBeforeLessonPartB lesson_type={this.session.lesson_type} next={this.nextStep} key={step} />;
       break;
     case this.steps.PART_B:
       screen = <LessonPart part={1} session={this.session} next={this.nextStep} key={step} />;
       break;
-    case this.steps.INFO:
+    case this.steps.INFO_C:
       this.session.continued = false;
       screen = <InfoBeforeLessonPartC lesson_type={this.session.lesson_type} next={this.nextStep} key={step} />;
       break;

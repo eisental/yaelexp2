@@ -1,12 +1,12 @@
 import React from 'react';
 import { AudioController } from '../audio_controller.js';
 import { LessonType, Strings, StaticImages, Chords, Timbres, musical_pieces_data } from '../defs.js';
-import { InfoScreen, LoadingScreen, ContinueButton } from '../ui.js';
+import { InfoScreen, LoadingScreen, ContinueButton, ButtonTable } from '../ui.js';
 import { randomSequence, shuffleArray } from '../randomize.js';
 import ls from 'local-storage';
 
 // each trial entry is [audio_idx, chord, transposition, timbre]
-let training_data = {
+const training_data = {
   musical_pieces: [
     [[1, Chords.BIG_MAJOR, 0, null], [2, Chords.SMALL_MAJOR, 0, null], 
      [3, Chords.SMALL_MINOR, 0, null], [4, Chords.HALF_DIM, 0, null]],
@@ -104,6 +104,20 @@ let training_data = {
   ],
 };
 
+const correction_data = {
+  [LessonType.MUSICAL_PIECES]: [
+    {[Chords.BIG_MAJOR]: 9, [Chords.SMALL_MAJOR]: 13, [Chords.SMALL_MINOR]: 17, [Chords.HALF_DIM]: 21 },
+    {[Chords.BIG_MAJOR]: 9, [Chords.SMALL_MAJOR]: 13, [Chords.SMALL_MINOR]: 17, [Chords.HALF_DIM]: 21 },
+    null,
+  ],
+  [LessonType.TONAL_CONTEXT]: [
+    {[Chords.BIG_MAJOR]: 9, [Chords.SMALL_MAJOR]: 13, [Chords.SMALL_MINOR]: 17, [Chords.HALF_DIM]: 21 },
+    {[Chords.BIG_MAJOR]: 9, [Chords.SMALL_MAJOR]: 13, [Chords.SMALL_MINOR]: 17, [Chords.HALF_DIM]: 21 },
+    null,
+  ],
+  [LessonType.AUTOMATIC]: [null, null, null]
+};
+
 const TrainingInfo = props => {
   let { lesson_type, next } = props;
   let info;
@@ -137,7 +151,7 @@ const InfoBeforeTrainingPartB = props => {
   case LessonType.MUSICAL_PIECES:
     info = (
       <div>
-        <p>בחלק זה תשמעו קטעים מוזיקליים בחליל ופסנתר ותצטרכו לזהות את האקורד המושמע בליווי.</p>
+        <p>בחלק זה תשמעו קטעים זהים, אך הפעם בביצוע של חליל ופסנתר, ותצטרכו לזהות את האקורד המושמע בליווי.</p>
         <p>עליכם לזהות את סוג האקורד במהירות האפשרית, וללחוץ עליו באמצעות העכבר.</p>
       </div>);
     break;
@@ -229,9 +243,9 @@ const SongWithChords = props => {
 
   const gen_button = (chord, i) => {
     if (disabled) 
-      return <td><button className="chordBtn" disabled key={i} onClick={(e) => next(chord)}>{chord}</button></td>;
+      return <td key={i}><button className="chordBtn" disabled key={i} onClick={(e) => next(chord)}>{chord}</button></td>;
     else 
-      return <td><button className="chordBtn" key={i} onClick={(e) => next(chord)}>{chord}</button></td>;
+      return <td key={i}><button className="chordBtn" key={i} onClick={(e) => next(chord)}>{chord}</button></td>;
   };
 
   return (
@@ -251,9 +265,11 @@ const SongWithChords = props => {
       <div className="row chordsTable text-center">
         <div className="col text-center chords">
           <table className="chordsTable text-center">
-            <tr>
-              {chord_buttons.map((chord, i) => gen_button(chord, i))}
-            </tr>
+            <tbody>
+              <tr>
+                {chord_buttons.map((chord, i) => gen_button(chord, i))}
+              </tr>
+            </tbody>
           </table>
         </div>
       </div>
@@ -261,76 +277,24 @@ const SongWithChords = props => {
   );
 };
 
-const ChordSelection = props => {
-  let { chord_buttons, disabled, with_song_names, next } = props;
-  const gen_button = (chord) => {
-    const label = with_song_names ? <p>{chord} <br/> {musical_pieces_data[chord].name}</p> : <p>{chord}</p>;
+const ChordSelection = ({chord_buttons, disabled, with_song_names, next}) => {
+  const labels = chord_buttons.map(chord => with_song_names ? 
+                                   <p>{chord} <br/> {musical_pieces_data[chord].name}</p> : 
+                                   <p>{chord}</p>);
 
-    if (disabled) 
-      return <button className="chordBtn" disabled onClick={(e) => next(chord)}>{label}</button>;
-    else 
-      return <button className="chordBtn" onClick={(e) => next(chord)}>{label}</button>;
-  };
-
-  return (
-    <table className="chordSelection">
-      <tr>
-        <td>{gen_button(chord_buttons[0])}</td>
-        <td></td>
-        <td>{gen_button(chord_buttons[1])}</td>
-      </tr>
-        <td></td>
-        <td className="plusSign align-middle">+</td>
-        <td></td>
-      <tr>
-        <td>{gen_button(chord_buttons[2])}</td>
-        <td></td>
-        <td>{gen_button(chord_buttons[3])}</td>
-      </tr>
-    </table>
-  );
-  return (
-    <div className="songDisplayWrapper">
-      <div className="row">
-        <div className="col-sm-2 offset-sm-2">
-          
-        </div>
-        <div className="col-sm-4">
-          &nbsp;
-        </div>
-        <div className="col-sm-2">
-          
-        </div>
-        <div className="col-sm-2">&nbsp;</div>
-      </div>
-      <div className="row text-center">
-        <div className="col-sm-2 offset-sm-5 plusSign align-middle">
-          +
-        </div>
-      </div>
-      <div className="row">
-        <div className="col-sm-2 offset-sm-2">
-          
-        </div>
-        <div className="col-sm-4">
-          &nbsp;
-        </div>
-        <div className="col-sm-2">
-          
-        </div>
-      </div>
-    </div>
-  );
+  return <ButtonTable labels={labels} values={chord_buttons} disabled={disabled} next={next} />;
 };
 
 class TrainingPart extends React.Component {
   state = {
-    trial_idx: 0,
+    trial_idx: 31,
     done_loading: false,
     done_playing: false,
     show_feedback: false,
     answer: null,
   };
+
+  trials_per_part = 32;
 
   constructor({part, session, chord_buttons, next, data}) {
     super();
@@ -339,7 +303,6 @@ class TrainingPart extends React.Component {
     this.chord_buttons = chord_buttons;
     this.next = next;
     this.data = data;
-    this.trials_per_part = 32;
 
     switch (session.lesson_type) {
     case LessonType.MUSICAL_PIECES:
@@ -372,6 +335,7 @@ class TrainingPart extends React.Component {
     const doneLoadingAudio = () => {
       that.setState({done_loading: true});
       that.audioController.play(that.sequence[that.state.trial_idx][0]);
+      that.response_start = new Date();
     };
 
     const donePlaying = () => {
@@ -390,8 +354,16 @@ class TrainingPart extends React.Component {
       }
     };
 
-    this.audioController = new AudioController(this.part_data.map(d => d[0]), doneLoadingAudio, donePlaying);
-    this.response_start = new Date();
+    let correction_idxs = [];
+    const corrections_for_part = correction_data[this.session.lesson_type][this.part];
+    if (corrections_for_part !== null) {
+      for (const chord in corrections_for_part)
+        correction_idxs.push(corrections_for_part[chord]);
+    }
+
+    console.log("audioidxs");
+    console.log(correction_idxs);
+    this.audioController = new AudioController(correction_idxs.concat(this.part_data.map(d => d[0])), doneLoadingAudio, donePlaying);
   }
 
   /* calculate the transposition count since the beginning of training (currently of part). */
@@ -449,9 +421,15 @@ class TrainingPart extends React.Component {
       if (!correct) {
         // start playing the chosen chord and then the right chord.
         // [idx, chord, trnsp, timbre]
+        console.log(correction_data);
         const selected_audio_idx = that.part_data.
           filter(d => d[1] === answer && d[2] === transposition && d[3] === trial_data[3])[0][0];
-        const correct_audio_idx = trial_data[0];
+        console.log(correction_data);
+        const corrections_for_part = correction_data[this.session.lesson_type][this.part];
+        const correct_audio_idx = corrections_for_part !== null ?
+              corrections_for_part[trial_data[1]] :
+              trial_data[0];
+        console.log("correct_audio_idx: " + correct_audio_idx);
 
         this.setState({show_feedback: true,
                        correct: correct,
@@ -476,10 +454,7 @@ class TrainingPart extends React.Component {
         screen = <SongWithChords songData={song_data} chord_buttons={this.chord_buttons} next={processAnswer}/>;
       }
       else {
-        screen = <ChordSelection 
-        chord_buttons={this.chord_buttons} 
-        with_song_names={this.session.lesson_type === LessonType.MUSICAL_PIECES}
-        next={processAnswer}/>;
+        screen = <ChordSelection chord_buttons={this.chord_buttons} next={processAnswer}/>;
       }
       
       return (
