@@ -2,12 +2,14 @@ let audioIdx2File = (idx) => "audio/" + idx + ".mp3";
 
 export class AudioController {
   constructor(srcs, onDoneLoading, onAudioEnded) {
-    this.srcs = srcs;
     this.players = [];
     this.ids2players = {};
     this.players2ids = {};
-    for (const id of this.srcs) {
+    for (const id of srcs) {
       const playerIdx = this.players.length;
+
+      if (id in this.ids2players) continue;
+
       this.ids2players[id] = playerIdx;
       this.players2ids[playerIdx] = id;
 
@@ -20,6 +22,7 @@ export class AudioController {
       this.players.push(p);
     }
 
+    console.log("Loading " + this.players.length + " audio files");
     this.loadCount = 0;
     this.onDoneLoading = onDoneLoading;
     this.onAudioEnded = onAudioEnded;

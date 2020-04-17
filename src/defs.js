@@ -14,6 +14,14 @@ export const Chords = {
 export const Timbres = {
   PIANO: 0,
   GUITAR: 1,
+  SONG: 2,
+}
+
+export const Variants = {
+  NONE: 0,
+  OPEN: 1,
+  INVERSION: 2,
+  REGISTER: 3,
 }
 
 export const StaticImages = {

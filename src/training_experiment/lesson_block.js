@@ -1,5 +1,5 @@
 import React from 'react';
-import { musical_pieces_data, LessonType, Strings, Chords } from '../defs.js';
+import { musical_pieces_data, LessonType, Chords } from '../defs.js';
 import { AudioController } from '../audio_controller.js';
 import { InfoScreen, LoadingScreen, ContinueButton } from '../ui.js';
 import { randomSequence } from '../randomize.js';
@@ -78,7 +78,7 @@ const SongWithoutChords = props => {
 // between them is the audio sequence. Audio playing code is here.
 class LessonPart extends React.Component {
   state = {
-    trial_idx: 15,
+    trial_idx: 0,
     done_playing: false,
     done_loading: false,
   }

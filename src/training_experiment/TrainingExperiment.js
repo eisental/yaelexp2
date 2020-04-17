@@ -1,7 +1,7 @@
 import React from 'react';
+import '../Experiment.css';
 import './TrainingExperiment.css';
 import { IntroText, InfoText, PretestInfo } from './info.js';
-import { LessonType, Strings } from '../defs.js';
 import { LessonBlock } from './lesson_block.js';
 import { TrainingBlock } from './training_block.js';
 import { InfoScreen, LoadingScreen, ErrorScreen, ContinueButton, ButtonTable } from '../ui.js';
@@ -41,7 +41,7 @@ const IntroScreen = ({next, data}) => {
   );
 };
 
-const FinishScreen = ({data, done_saving, session_number}) => {
+const FinishScreen = ({done_saving, session_number}) => {
   const remaining = MAX_NUMBER_OF_SESSIONS - session_number;
   return (
     <div className="container">
@@ -348,7 +348,7 @@ class TrainingExperiment extends React.Component {
   }
 
   dataSaveError = (response) => {
-    alert("Error: " + response);
+    alert("Error while saving data: " + response);
   }
 
   sessionEventError = (response) => { // TODO
@@ -378,8 +378,7 @@ class TrainingExperiment extends React.Component {
 
   getScreenForStep(step) {
     let screen;
-    {
-      switch(step) {
+    switch(step) {
       case this.steps.INTRO:
         screen = <IntroScreen data={this.data} next={this.nextStep} />;
         break;
@@ -403,9 +402,9 @@ class TrainingExperiment extends React.Component {
         screen = <TrainingBlock data={this.data} next={this.nextStep} session={this.state.session} />;
         break;
       case this.steps.FINISH:
-        screen = <FinishScreen data={this.data} done_saving={this.state.done_saving} session_number={this.state.session.number} />;
-      }
+        screen = <FinishScreen done_saving={this.state.done_saving} session_number={this.state.session.number} />;
     }
+    
     return screen;
   } 
 

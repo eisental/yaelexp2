@@ -132,9 +132,10 @@ const TrainingInfo = props => {
   case LessonType.TONAL_CONTEXT:
     info = (
       <div>
-        <p>בחלק זה תשמעו צמדים מוזיקליים לאחר מבוא טונאלי של סולם עולה ויורד, ותצטרכו לזהות את האקורד הראשון בכל צמד. האקורד אותו תצטרכו לזהות יושמע שוב לאחר שמיעת צמד האקורדים.</p>
+        <p>בחלק זה תשמעו צמדים מוזיקליים לאחר מבוא טונאלי של סולם עולה ויורד, ותצטרכו לזהות את האקורד הראשון בכל צמד.</p>
         <p>עליכם לזהות את סוג האקורד במהירות האפשרית, וללחוץ עליו באמצעות העכבר.</p>
       </div>);
+    break;
   case LessonType.AUTOMATIC:
     info = (
       <div>
@@ -287,7 +288,7 @@ const ChordSelection = ({chord_buttons, disabled, with_song_names, next}) => {
 
 class TrainingPart extends React.Component {
   state = {
-    trial_idx: 31,
+    trial_idx: 0,
     done_loading: false,
     done_playing: false,
     show_feedback: false,
@@ -422,10 +423,11 @@ class TrainingPart extends React.Component {
         // start playing the chosen chord and then the right chord.
         // [idx, chord, trnsp, timbre]
         console.log(correction_data);
-        const selected_audio_idx = that.part_data.
-          filter(d => d[1] === answer && d[2] === transposition && d[3] === trial_data[3])[0][0];
-        console.log(correction_data);
         const corrections_for_part = correction_data[this.session.lesson_type][this.part];
+        const selected_audio_idx = corrections_for_part !== null ?
+              corrections_for_part[answer] :
+              that.part_data.filter(d => d[1] === answer && d[2] === transposition && d[3] === trial_data[3])[0][0];
+
         const correct_audio_idx = corrections_for_part !== null ?
               corrections_for_part[trial_data[1]] :
               trial_data[0];

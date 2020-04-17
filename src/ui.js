@@ -38,10 +38,14 @@ export const InfoScreen = ({info, next}) => {
   );
 };
 
-export const ContinueButton = ({next, disabled}) => {
+export const Button = ({label, onClick, disabled}) => {
   return disabled ? 
-    <button type="button" className="btn btn-primary" onClick={next} disabled>{Strings.continue_text}</button> :
-    <button type="button" className="btn btn-primary" onClick={next}>{Strings.continue_text}</button>;
+    <button type="button" className="btn btn-primary" onClick={onClick} disabled>{label}</button> :
+    <button type="button" className="btn btn-primary" onClick={onClick}>{label}</button>;
+};
+
+export const ContinueButton = ({next, disabled}) => {
+  return <Button label={Strings.continue_text} onClick={next} disabled={disabled}/>;
 };
 
 /* 4 buttons in a square layout with fixation point in the middle. Each button is assigned a value to be passed to 
