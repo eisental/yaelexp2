@@ -193,7 +193,8 @@ export const test_b_indexing = (chord, transposition, timbre, variant) => {
     case Chords.HALF_DIM: idx += 72; break;
   }
 
-  return idx += variant*3 + transposition;  
+  idx += (variant-1)*4 + transposition;
+  return idx;
 }
 
 export const test_d_indexing = (chord, transposition, timbre, type) => {

@@ -24,3 +24,10 @@
 .chordBtn p {
     margin-bottom: 0;
 }
+
+.plusSign{
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
+  font-size: 120px;
+  font-weight: 100;
+  padding: 50px 100px 50px 100px;
+}

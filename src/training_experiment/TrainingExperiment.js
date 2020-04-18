@@ -136,7 +136,7 @@ class TrainingExperiment extends React.Component {
     INTRO: 1,
     INFO: 2, 
     PRETEST_INFO: 3,
-    PRETEST: 4,
+    PRETEST: 4, 
     LESSON: 5,
     TRAINING: 6,
     FINISH: 7

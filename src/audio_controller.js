@@ -8,7 +8,9 @@ export class AudioController {
     for (const id of srcs) {
       const playerIdx = this.players.length;
 
-      if (id in this.ids2players) continue;
+      if (id in this.ids2players) {
+        continue;
+      }
 
       this.ids2players[id] = playerIdx;
       this.players2ids[playerIdx] = id;

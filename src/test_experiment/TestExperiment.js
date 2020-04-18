@@ -107,7 +107,7 @@ class TestExperiment extends React.Component {
 
     const altered_step = this.stepWillChange(step, new_step);
     this.setState({step: altered_step || new_step});
-    this.stepChanged(new_step);
+    this.stepChanged(altered_step || new_step);
   }
 
   stepWillChange = (step, new_step) => {
@@ -200,7 +200,7 @@ class TestExperiment extends React.Component {
         const test_info = <TestInfo />;
         return <InfoScreen info={test_info} next={this.nextStep} />;
       case this.steps.PRETEST:
-        return <PretestBlock next={this.nextStep} button_labels={this.chord_button_labels} />;
+        return <PretestBlock next={this.nextStep} button_labels={this.chord_button_labels} data={this.data} />;
       case this.steps.SUB_TESTS:
         return <SubtestsBlock next={this.nextStep} data={this.data} button_labels={this.chord_button_labels} />;
       case this.steps.PERSONAL_INFO:

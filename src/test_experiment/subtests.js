@@ -42,9 +42,10 @@ class TestBlock extends React.Component {
     loading: true,
   }
 
-  constructor({test_num, chord_button_labels, next, data}) {
+  constructor({test_num, test_idx, chord_button_labels, next, data}) {
     super();
     this.test_num = test_num;
+    this.test_idx = test_idx;
     this.chord_button_labels = chord_button_labels;
     this.next = next;
     this.data = data;
@@ -57,7 +58,7 @@ class TestBlock extends React.Component {
       this.sequence = cont_sequence;
 
       const cont_trial_idx = ls.get(this.ls_prefix + "trial_idx");
-      if (cont_trial_idx !== null) 
+      if (cont_trial_idx !== null)
         this.state.trial_idx = cont_trial_idx;
 
       const cont_show_info = ls.get(this.ls_prefix + "show_info");
@@ -84,6 +85,11 @@ class TestBlock extends React.Component {
 
     console.log("Starting subtest " + this.test_num + ". sequence:");
     console.log(this.sequence);
+
+    if (!this.state.show_info) {
+      this.audioController.play(this.sequence[this.state.trial_idx][0]);
+      this.response_start = new Date();
+    }
   }
 
   make_test_sequence = (test_num) => {
@@ -102,8 +108,9 @@ class TestBlock extends React.Component {
   }
   
   pick_unique_two = arr => {
-    const fst = randomElement(arr);
-    const snd = randomElement(arr.slice(0, fst).concat(arr.slice(fst+1, 4)));
+    const fst_idx = randomInt(0, arr.length-1);
+    const fst = arr[fst_idx]
+    const snd = randomElement(arr.slice(0, fst_idx).concat(arr.slice(fst_idx+1, arr.length)));
     return [fst, snd];
   }
 
@@ -111,7 +118,7 @@ class TestBlock extends React.Component {
     let sequence = [];
     for (let c in Chords) {
       for (let trnsp = 0; trnsp < 4; trnsp++) {
-        const [var1, var2] = this.pick_unique_two([0,1,2,3]);
+        const [var1, var2] = this.pick_unique_two([1,2,3]);
         sequence.push(this.test_data[test_b_indexing(Chords[c], trnsp, randomInt(0, 1), var1)]);
         sequence.push(this.test_data[test_b_indexing(Chords[c], trnsp, randomInt(0, 1), var2)]);        
       }
@@ -134,9 +141,8 @@ class TestBlock extends React.Component {
   get_transposition_play_count = () => { 
     const idx = this.state.trial_idx;
     const trial = this.sequence[idx];
-    const count_in_part = this.sequence.slice(0, idx)
+    return this.sequence.slice(0, idx)
       .filter(t => t[1] === trial[1] && t[2] === trial[2]).length + 1;
-    return count_in_part;
   }
 
   startTrials = () => {
@@ -147,8 +153,29 @@ class TestBlock extends React.Component {
     this.response_start = new Date();
   }
 
-  nextTrial = () => {
+  nextTrial = (answer) => {
     const { trial_idx } = this.state;
+
+    // collect data
+    const trial_info = this.sequence[trial_idx];
+    const td = {
+      time: new Date().toString(),
+      subtest: this.test_num + 1,
+      variant: trial_info[4],
+      audio_index: trial_info[0],
+      chord_number: 32 * this.test_idx + this.state.trial_idx + 1,
+      chord_type: trial_info[1],
+      transposition: trial_info[2] + 1,
+      transposition_play_count: this.get_transposition_play_count(),
+      selected_chord_type: answer,
+      correct: answer === trial_info[1],
+      response_time: new Date() - this.response_start,
+    };
+
+    this.data.trials.push(td);
+    ls.set("test_data", this.data);
+    
+    console.log("answer is: " + answer);
 
     this.audioController.stop(this.sequence[trial_idx][0]);
 
@@ -158,8 +185,6 @@ class TestBlock extends React.Component {
     else {
       this.setState({trial_idx: trial_idx + 1});      
       ls.set(this.ls_prefix + "trial_idx", trial_idx + 1);
-
-      // collect data
 
       this.audioController.play(this.sequence[trial_idx+1][0]);
       this.response_start = new Date();
@@ -228,8 +253,8 @@ export class SubtestsBlock extends React.Component {
   render() {
     const { test_idx } = this.state;
     const test_num = this.test_order[test_idx];
-
-    return <TestBlock test_num={test_num}
+    
+    return <TestBlock test_num={test_num} test_idx={test_idx}
                       chord_button_labels={this.chord_button_labels} 
                       next={this.nextTest} 
                       data={this.data}

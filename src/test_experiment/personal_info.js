@@ -1,5 +1,6 @@
 import React from 'react';
 import { ContinueButton } from '../ui.js';
+import ls from 'local-storage';
 
 export class PersonalInfoScreen extends React.Component {
   constructor({data, next}) {
@@ -35,6 +36,8 @@ export class PersonalInfoScreen extends React.Component {
       return;
     }
     this.data.trials.push({
+      time: new Date().toString(),
+      subtest: 5,
       age: age,
       gender: gender,
       musical_background: musical_background,
@@ -43,7 +46,7 @@ export class PersonalInfoScreen extends React.Component {
       small_min_recognition: small_min_recognition,
       half_dim_recognition: half_dim_recognition,
     });
-
+    ls.set("test_data", this.data);
     this.next();
   }
 
@@ -51,7 +54,7 @@ export class PersonalInfoScreen extends React.Component {
     return (
       <div className="container">
         <div className="row">
-          <div className="col-sm-6 offset-sm-3">
+          <div className="col-sm-8 offset-sm-2 personal-info-form">
             <p>שאלון פרטים אישיים:</p>
             <label htmlFor="age">גיל:</label>
             <input type="text" id="age" name="age" maxLength="2"/>
@@ -68,6 +71,7 @@ export class PersonalInfoScreen extends React.Component {
               <option value="2">ניגנתי פחות משנה</option>
               <option value="3">ניגנתי פחות משנתיים</option>
             </select>
+            <br/>
             <label htmlFor="big_maj_recognition">על סמך מה זיהית את אקורד "מז'ור גדול"?</label>
             <textarea id="big_maj_recognition" rows="4" cols="50"/>
             <label htmlFor="small_maj_recognition">על סמך מה זיהית את אקורד "מז'ור קטן"?</label>
@@ -79,10 +83,11 @@ export class PersonalInfoScreen extends React.Component {
           </div>
         </div>
         <div className="row">
-          <div className="col-sm-6 offset-sm-3 text-center">
+          <div className="col-sm-8 offset-sm-2 text-center">
             <ContinueButton next={this.saveData} />
           </div>
         </div>
+        <div className="row">&nbsp;</div>
       </div>
     );
   }

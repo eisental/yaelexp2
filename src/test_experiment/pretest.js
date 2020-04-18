@@ -67,11 +67,23 @@ export class PretestBlock extends React.Component {
     console.log(this.sequence);
   }
 
-  nextTrial = () => {
+  nextTrial = (answer) => {
     const { trial_idx } = this.state;
+
+    this.data.trials.push({
+      time: new Date().toString(),
+      subtest: 0,
+      chord_type: this.sequence[trial_idx % this.trials_count],
+      selected_chord_type: answer,
+      correct: answer === this.sequence[trial_idx % this.trials_count],
+      response_time: new Date() - this.response_start
+    });
+    ls.set("test_data", this.data);
+
     this.setState({trial_idx: trial_idx + 1,
                    keep_going: false});
     ls.set(this.ls_prefix + "trial_idx", trial_idx + 1);
+    this.response_start = new Date();
   }
 
   keepGoing = () => {
@@ -80,7 +92,12 @@ export class PretestBlock extends React.Component {
     console.log("sequence:");
     console.log(this.sequence);
     this.setState({keep_going: true});
+    this.response_start = new Date();
   };
+
+  componentDidMount() {
+    this.response_start = new Date();
+  }
   
   render() {
     const { trial_idx } = this.state;

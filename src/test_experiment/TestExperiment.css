@@ -22,3 +22,12 @@
 .overlay-box p {
     margin-top: 60px;
 }
+
+.personal-info-form label {
+    margin-left: 0.5em;    
+}
+
+.personal-info-form input {
+    margin-left: 0.5em;
+}
+
