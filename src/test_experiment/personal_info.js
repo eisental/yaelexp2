@@ -30,8 +30,14 @@ export class PersonalInfoScreen extends React.Component {
     const small_maj_recognition = document.getElementById('small_maj_recognition').value;
     const small_min_recognition = document.getElementById('small_min_recognition').value;
     const half_dim_recognition = document.getElementById('half_dim_recognition').value;
+    const hwcomputer = document.getElementById('hwcomputer').value;
+    const hwdisplay = document.getElementById('hwdisplay').value;
+    const hwmouse = document.getElementById('hwmouse').value;
+    const hwheadphones = document.getElementById('hwheadphones').value;
     if (big_maj_recognition.length===0 || small_maj_recognition.length===0 ||
-        small_min_recognition.length===0 || half_dim_recognition.length===0) {
+        small_min_recognition.length===0 || half_dim_recognition.length===0 ||
+        hwcomputer.length===0 || hwdisplay.length===0 || 
+        hwmouse.length===0 || hwheadphones.length===0) {
       alert("אנא ענו על כל השאלות.");
       return;
     }
@@ -45,6 +51,10 @@ export class PersonalInfoScreen extends React.Component {
       small_maj_recognition: small_maj_recognition,
       small_min_recognition: small_min_recognition,
       half_dim_recognition: half_dim_recognition,
+      computer: hwcomputer,
+      display: hwdisplay,
+      mouse: hwmouse,
+      headphones: hwheadphones,
     });
     ls.set("test_data", this.data);
     this.next();
@@ -73,13 +83,23 @@ export class PersonalInfoScreen extends React.Component {
             </select>
             <br/>
             <label htmlFor="big_maj_recognition">על סמך מה זיהית את אקורד "מז'ור גדול"?</label>
-            <textarea id="big_maj_recognition" rows="4" cols="50"/>
+            <textarea id="big_maj_recognition" rows="2" cols="50"/>
             <label htmlFor="small_maj_recognition">על סמך מה זיהית את אקורד "מז'ור קטן"?</label>
-            <textarea id="small_maj_recognition" rows="4" cols="50"/>
+            <textarea id="small_maj_recognition" rows="2" cols="50"/>
             <label htmlFor="small_min_recognition">על סמך מה זיהית את אקורד "מינור קטן"?</label>
-            <textarea id="small_min_recognition" rows="4" cols="50"/>
+            <textarea id="small_min_recognition" rows="2" cols="50"/>
             <label htmlFor="half_dim_recognition">על סמך מה זיהית את אקורד "חצי מוקטן"?</label>
-            <textarea id="half_dim_recognition" rows="4" cols="50"/>            
+            <textarea id="half_dim_recognition" rows="2" cols="50"/>            
+            <p>אנא מלאו את הפרטים של החומרה בה השתמשתם בתרגול ובמבחן. אנא פרטו את הדגם המדויק בכל אחד מן הסעיפים.</p>
+            <label htmlFor="hwcomputer">מחשב:</label><br/>
+            <textarea id="hwcomputer" rows="2" cols="50"/><br/>
+            <label htmlFor="display">מסך מחשב:</label><br/>
+            <textarea id="hwdisplay" rows="2" cols="50"/><br/>
+            <label htmlFor="hwmouse">עכבר:</label><br/>
+            <textarea id="hwmouse" rows="2" cols="50"/><br/>
+            <label htmlFor="hwheadphones">אוזניות:</label><br/>
+            <textarea id="hwheadphones" rows="2" cols="50"/><br/>
+
           </div>
         </div>
         <div className="row">
