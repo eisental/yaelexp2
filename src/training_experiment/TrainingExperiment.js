@@ -221,37 +221,18 @@ class TrainingExperiment extends React.Component {
           else {
             // Can't continue session. Start a new one if possible. 
             ls.clear();
-            if (last_session_number >= MAX_NUMBER_OF_SESSIONS) {
-              // enforce the session limit.
-              this.setState({max_sessions_reached: true,
-                             session: session});
-            } 
-            else {
-              // Continue to next session. 
-              // TODO: should this automatically add another lesson? or just use the same session number?
-              session.number = last_session_number + 1;
-              writeSessionEvent(this.conn, session, 
+            // Redo the session (this shouldn't actually happen)
+            session.number = last_session_number;
+            writeSessionEvent(this.conn, session, 
                                 SessionEvent.SESSION_START);
             this.setState({session: session});
-            }            
           }
         }
         else {
           // A new day. TODO: what happens when max session reached on unfinished session?
           ls.clear();
-          if (last_session_number >= MAX_NUMBER_OF_SESSIONS) {
-            // enforce the session limit.
-            this.setState({max_sessions_reached: true,
-                           session: session});
-          } 
-          else {
-            // Continue to next session. 
-            // TODO: should this automatically add another lesson? or just use the same session number?
-            session.number = last_session_number + 1;
-            writeSessionEvent(this.conn, session, 
-                              SessionEvent.SESSION_START);
-            this.setState({session: session});
-          }
+          this.setState({cant_continue_session: true,
+                         session: session});
         }
       }
       else {
@@ -425,7 +406,9 @@ class TrainingExperiment extends React.Component {
         else if (this.state.session_done_for_today)
           screen = <ErrorScreen error="ביצעת כבר הפעלה אחת של התוכנה היום. ניתן להתחבר שוב מחר." />;
         else if (this.state.did_load_registration_list && this.state.user_unregistered)
-          screen = <ErrorScreen error="מספר הנבדק לא קיים במערכת! אנא צור קשר עם הנסיינית ונסה שוב." />;
+          screen = <ErrorScreen error="מספר הנבדק לא קיים במערכת! אנא צרו קשר עם הנסיינית ונסו שוב." />;
+        else if (this.state.cant_continue_session) 
+          screen = <ErrorScreen error="ההפעלה האחרונה שלך לא הושלמה. לא ניתן להמשיך בניסוי. אנא צרו קשר עם הנסיינית." />;
         else screen = this.getScreenForStep(step);
       }
     }
