@@ -219,9 +219,8 @@ class TrainingExperiment extends React.Component {
             this.stepChanged(continued_step);
           } 
           else {
-            // Can't continue session. Start a new one if possible. 
+            // Can't continue session. Redo the session (this shouldn't actually happen)
             ls.clear();
-            // Redo the session (this shouldn't actually happen)
             session.number = last_session_number;
             writeSessionEvent(this.conn, session, 
                                 SessionEvent.SESSION_START);
@@ -229,7 +228,7 @@ class TrainingExperiment extends React.Component {
           }
         }
         else {
-          // A new day. TODO: what happens when max session reached on unfinished session?
+          // A new day.
           ls.clear();
           this.setState({cant_continue_session: true,
                          session: session});
