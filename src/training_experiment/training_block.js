@@ -451,7 +451,7 @@ class TrainingPart extends React.Component {
 
     if (!this.state.show_feedback) {
       let screen;
-      if (this.part < 2 && this.session.lesson_type === LessonType.MUSICAL_PIECES) {
+      if (this.part === 0 && this.session.lesson_type === LessonType.MUSICAL_PIECES) {
         const song_data = musical_pieces_data[chord_name];
         screen = <SongWithChords songData={song_data} chord_buttons={this.chord_buttons} next={processAnswer}/>;
       }
