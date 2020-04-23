@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, ContinueButton, ButtonTable } from '../ui.js';
+import { Button, ButtonTable } from '../ui.js';
 import ls from 'local-storage';
 import { randomSequence } from '../randomize.js';
 

@@ -1,6 +1,6 @@
 import React from 'react';
-import { LoadingScreen, ButtonTable, ContinueButton, InfoScreen } from '../ui.js';
-import { Chords, Timbres, Variants } from '../defs.js';
+import { LoadingScreen, ButtonTable, InfoScreen } from '../ui.js';
+import { Chords, Timbres } from '../defs.js';
 import { audio_mapping, test_d_indexing, test_b_indexing } from './audio_mapping.js';
 import ls from 'local-storage';
 import { randomInt, randomElement, shuffleArray, randomSequence } from '../randomize.js';

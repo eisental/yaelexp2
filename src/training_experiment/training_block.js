@@ -329,8 +329,8 @@ class TrainingPart extends React.Component {
       ls.set(this.ls_prefix + "sequence", this.sequence);
       ls.set(this.ls_prefix + "trial_idx", this.state.trial_idx);
     }
-    console.log("TRAINING PART " + part + " sequence:");
-    console.log(this.sequence);
+//    console.log("TRAINING PART " + part + " sequence:");
+//    console.log(this.sequence);
 
     const that = this;
     const doneLoadingAudio = () => {
@@ -362,8 +362,6 @@ class TrainingPart extends React.Component {
         correction_idxs.push(corrections_for_part[chord]);
     }
 
-    console.log("audioidxs");
-    console.log(correction_idxs);
     this.audioController = new AudioController(correction_idxs.concat(this.part_data.map(d => d[0])), doneLoadingAudio, donePlaying);
   }
 
@@ -422,7 +420,7 @@ class TrainingPart extends React.Component {
       if (!correct) {
         // start playing the chosen chord and then the right chord.
         // [idx, chord, trnsp, timbre]
-        console.log(correction_data);
+
         const corrections_for_part = correction_data[this.session.lesson_type][this.part];
         const selected_audio_idx = corrections_for_part !== null ?
               corrections_for_part[answer] :
@@ -431,7 +429,6 @@ class TrainingPart extends React.Component {
         const correct_audio_idx = corrections_for_part !== null ?
               corrections_for_part[trial_data[1]] :
               trial_data[0];
-        console.log("correct_audio_idx: " + correct_audio_idx);
 
         this.setState({show_feedback: true,
                        correct: correct,

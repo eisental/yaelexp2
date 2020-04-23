@@ -116,8 +116,8 @@ class LessonPart extends React.Component {
       ls.set(this.ls_prefix + "trial_idx", this.state.trial_idx);
     }
 
-    console.log("LESSON PART " + part + " sequence:");
-    console.log(this.sequence);
+//    console.log("LESSON PART " + part + " sequence:");
+//    console.log(this.sequence);
 
     const that = this;
     const doneLoadingAudio = () => {

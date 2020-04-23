@@ -53,6 +53,11 @@ const FinishScreen = ({done_saving, session_number}) => {
   );
 };
 
+const ContinueScreen = ({session_number, next}) => {
+  const info = <p className="text-center">לחץ על הכפתור כדי להמשיך את הפעלה מספר {session_number}.</p>;
+  return <InfoScreen info={info} next={next} />;
+};
+
 class PretestBlock extends React.Component {
   state = {
     trial_idx: 0,
@@ -83,8 +88,8 @@ class PretestBlock extends React.Component {
       ls.set(this.ls_prefix + "trial_idx", this.state.trial_idx);
     }
 
-    console.log("Pretest sequence:");
-    console.log(this.sequence);
+//    console.log("Pretest sequence:");
+//    console.log(this.sequence);
     this.response_start = new Date();
   }
 
@@ -199,7 +204,7 @@ class TrainingExperiment extends React.Component {
           // Same day. Try to continue the last session.
           session.number = last_session_number;
           // Retreive session and data from local storage.
-          console.log("Loading session data from local storage.");
+          console.log("Looking for session data in local storage.");
           const continued_session = ls.get('session');
           if (continued_session && continued_session.id === session.id) {
             writeSessionEvent(this.conn, session, 
@@ -214,7 +219,7 @@ class TrainingExperiment extends React.Component {
             const continued_step = ls.get('step');
             
             session.continued = true;
-            this.setState({step: continued_step || this.steps.INFO,
+            this.setState({continued_step: continued_step || this.steps.INFO,
                            session: session});
             this.stepChanged(continued_step);
           } 
@@ -301,7 +306,7 @@ class TrainingExperiment extends React.Component {
 
       // write data
       console.log("Saving data...");
-      console.log(this.data.trials);
+//      console.log(this.data.trials);
 
       this.data.trials.forEach(t => { 
         t.id = this.data.id;
@@ -388,6 +393,16 @@ class TrainingExperiment extends React.Component {
     return screen;
   } 
 
+  continue_session = () => {
+    const { continued_step, step } = this.state;
+    this.stepWillChange(step, continued_step);
+    this.setState({
+      step: continued_step,
+      continued_step: undefined
+    });
+    this.stepChanged(continued_step);
+  }
+
   render() {
     const {step} = this.state;
 
@@ -395,7 +410,10 @@ class TrainingExperiment extends React.Component {
 
     if (this.state.is_loading_session || !this.state.did_load_lesson_type)
       screen = <LoadingScreen />;
-    if (this.state.step === 2) {
+    
+    if (this.state.continued_step !== undefined) {
+      screen = <ContinueScreen session_number={this.state.session.number} next={this.continue_session}/>;
+    } else if (this.state.step === 2) {
       // After entering ID on the intro screen we check the session data before continuing.
       if (!this.state.did_load_registration_list || !this.state.session) 
         screen = <LoadingScreen />;

@@ -21,6 +21,10 @@
   color: darkgray;
 }
 
+.chordBtn:active {
+    background-color: darkgray;
+}
+
 .chordBtn p {
     margin-bottom: 0;
 }

@@ -5,7 +5,7 @@
 const read_url = "https://sheets.googleapis.com/v4/spreadsheets/";
 
 // https://stackoverflow.com/questions/1714786/query-string-encoding-of-a-javascript-object
-const serialize = function(obj, prefix) {
+export const serialize = function(obj, prefix) {
   var str = [],
     p;
   for (p in obj) {
