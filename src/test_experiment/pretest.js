@@ -63,8 +63,8 @@ export class PretestBlock extends React.Component {
       ls.set(this.ls_prefix + "sequence", this.sequence);
       ls.set(this.ls_prefix + "trial_idx", this.state.trial_idx);      
     }
-    console.log("sequence:");
-    console.log(this.sequence);
+//    console.log("sequence:");
+//    console.log(this.sequence);
   }
 
   nextTrial = (answer) => {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { LoadingScreen, ButtonTable, InfoScreen } from '../ui.js';
+import { ContinueButton, LoadingScreen, ButtonTable, InfoScreen } from '../ui.js';
 import { Chords, Timbres } from '../defs.js';
 import { audio_mapping, test_d_indexing, test_b_indexing } from './audio_mapping.js';
 import ls from 'local-storage';
@@ -83,8 +83,8 @@ class TestBlock extends React.Component {
 
     this.audioController = new AudioController(this.sequence.map(d => d[0]), doneLoadingAudio, donePlaying);
 
-    console.log("Starting subtest " + this.test_num + ". sequence:");
-    console.log(this.sequence);
+    //console.log("Starting subtest " + this.test_num + ". sequence:");
+    //console.log(this.sequence);
 
     if (!this.state.show_info) {
       this.audioController.play(this.sequence[this.state.trial_idx][0]);
@@ -109,7 +109,7 @@ class TestBlock extends React.Component {
   
   pick_unique_two = arr => {
     const fst_idx = randomInt(0, arr.length-1);
-    const fst = arr[fst_idx]
+    const fst = arr[fst_idx];
     const snd = randomElement(arr.slice(0, fst_idx).concat(arr.slice(fst_idx+1, arr.length)));
     return [fst, snd];
   }
@@ -153,7 +153,26 @@ class TestBlock extends React.Component {
     this.response_start = new Date();
   }
 
-  nextTrial = (answer) => {
+  nextTrial = () => {
+    const { trial_idx } = this.state;
+
+    this.audioController.stop(this.sequence[trial_idx][0]);
+
+    if (trial_idx + 1 >= this.sequence.length) {
+      this.next();
+    }
+    else {
+      this.setState({trial_idx: trial_idx + 1,
+                    show_next_trial_btn: false});      
+      ls.set(this.ls_prefix + "trial_idx", trial_idx + 1);
+      ls.set("test_data", this.data);
+
+      this.audioController.play(this.sequence[trial_idx+1][0]);
+      this.response_start = new Date();
+    }
+  }
+
+  processAnswer = (answer) => {
     const { trial_idx } = this.state;
 
     // collect data
@@ -173,22 +192,8 @@ class TestBlock extends React.Component {
     };
 
     this.data.trials.push(td);
-    ls.set("test_data", this.data);
-    
-    console.log("answer is: " + answer);
 
-    this.audioController.stop(this.sequence[trial_idx][0]);
-
-    if (trial_idx + 1 >= this.sequence.length) {
-      this.next();
-    }
-    else {
-      this.setState({trial_idx: trial_idx + 1});      
-      ls.set(this.ls_prefix + "trial_idx", trial_idx + 1);
-
-      this.audioController.play(this.sequence[trial_idx+1][0]);
-      this.response_start = new Date();
-    }
+    this.setState({show_next_trial_btn: true});
   }
 
   render() {
@@ -199,9 +204,16 @@ class TestBlock extends React.Component {
       return <SubtestInfo test_num={this.test_num} next={this.startTrials} />;
     }
     else {
+      const next_trial_button = this.state.show_next_trial_btn ?
+        <ContinueButton next={this.nextTrial} /> : null;
       return (
         <div className="container">
-          <ButtonTable labels={this.chord_button_labels} values={this.chord_button_labels} next={this.nextTrial} key={trial_idx} />
+          <div className="row">          
+            <ButtonTable labels={this.chord_button_labels} values={this.chord_button_labels} next={this.processAnswer} disabled={this.state.show_next_trial_btn} key={trial_idx} />
+          </div>
+          <div className="next-trail-btn">
+            {next_trial_button}
+          </div>
         </div>
       );
     }

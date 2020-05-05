@@ -19,6 +19,24 @@
     left: 0;
 }
 
+.next-trail-btn {
+    text-align:center;
+    height: 150px;/*height needs to be set*/
+    border-radius: 100px;
+    width: 200px;
+    margin: auto;
+    margin-top: 284px;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+.next-trail-btn .btn {
+    font-size: 2em;
+}
+
 .overlay-box p {
     margin-top: 60px;
 }

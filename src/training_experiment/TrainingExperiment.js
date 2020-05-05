@@ -207,8 +207,6 @@ class TrainingExperiment extends React.Component {
           console.log("Looking for session data in local storage.");
           const continued_session = ls.get('session');
           if (continued_session && continued_session.id === session.id) {
-            writeSessionEvent(this.conn, session, 
-                              SessionEvent.SESSION_CONTINUED, this.sessionEventError);
             session = continued_session;
             const continued_data = ls.get('data');
             if (continued_data) {
@@ -401,6 +399,9 @@ class TrainingExperiment extends React.Component {
       continued_step: undefined
     });
     this.stepChanged(continued_step);
+
+    writeSessionEvent(this.conn, this.state.session, 
+                      SessionEvent.SESSION_CONTINUED, this.sessionEventError);
   }
 
   render() {
