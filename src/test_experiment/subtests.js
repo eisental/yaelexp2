@@ -1,55 +1,64 @@
 import React from 'react';
-import { ContinueButton, LoadingScreen, ButtonTable, InfoScreen } from '../ui.js';
+import { ReplayButton, ContinueButton, LoadingScreen, ButtonTable, InfoScreen } from '../ui.js';
 import { Chords, Timbres } from '../defs.js';
-import { audio_mapping, test_d_indexing, test_b_indexing } from './audio_mapping.js';
+import { audio_mapping, test_a_indexing, test_c_indexing } from './audio_mapping.js';
 import ls from 'local-storage';
-import { randomInt, randomElement, shuffleArray, randomSequence } from '../randomize.js';
+import { repeatArray, randomInt, randomElement, shuffleArray, randomSequence } from '../randomize.js';
 import { AudioController } from '../audio_controller.js';
 
-const SubtestInfo = ({test_num, next}) => {
+const SubtestInfo = ({test_num, is_free, next}) => {
   let info;
   switch (test_num) {
   case 0:
+    if (is_free) {
+      info = <p>בחלק זה יושמעו אקורדים בודדים. עליכם לזהות את סוג האקורד, וללחוץ עליו במהירות האפשרית. ניתן ללחוץ על לחצן הרמקול בכדי להאזין לאקורד שוב (עד פעמיים נוספות).</p>;
+    }
+    else {
+      info = <p>בחלק זה יושמעו אקורדים בודדים. עליכם לזהות את סוג האקורד, וללחוץ עליו במהירות האפשרית.</p>;
+    }
+    break;
   case 1:
-    info = (
-      <div>
-        <p>בחלק זה יושמעו אקורדים בודדים. עליך לזהות את סוג האקורד, וללחוץ עליו במהירות האפשרית.</p>
-      </div>
-    );
+    if (is_free) {
+      info = <p>בחלק זה יושמעו קטעים מוזיקליים קצרים מתוך שירים. האקורד אותו עליכם לזהות יהיה האקורד הראשון בכל קטע. הוא ינוגן בשנית בסוף הקטע המוזיקלי. עליכם לזהות אותו וללחוץ על סוג האקורד במהירות האפשרית. ניתן ללחוץ על לחצן הרמקול בכדי להאזין לאקורד שוב (עד פעמיים נוספות).</p>;
+    }
+    else {
+      info = <p>בחלק זה יושמעו קטעים מוזיקליים קצרים מתוך שירים. האקורד אותו עליכם לזהות יהיה האקורד הראשון בכל קטע. הוא ינוגן בשנית בסוף הקטע המוזיקלי. עליכם לזהות אותו וללחוץ על סוג האקורד במהירות האפשרית.</p>;
+    }
     break;
   case 2:
-    info = (
-      <div>
-        <p>בחלק זה יושמעו קטעים מוזיקליים קצרים מתוך שירים. האקורד אותו עליך לזהות יהיה האקורד הראשון בכל קטע. הוא ינוגן בשנית בסוף הקטע המוזיקלי. עליך לזהות אותו וללחוץ על סוג האקורד במהירות האפשרית</p>
-      </div>
-    );
-    break;
-  case 3:
-    info = (
-      <div>
-        <p>בחלק זה יושמע מבוא טונאלי (סולם עולה ויורד) ואחריו צמדים של שני אקורדים. עליך לזהות את האקורד הראשון שמושמע מתוך הצמד, וללחוץ על סוג האקורד במהירות האפשרית.</p>
-      </div>
-    );
+    if (is_free) {
+      info = <p>מיד תשמעו צמדי אקורדים. לפני כל צמד אקורדים תשמעו סולם עולה ויורד (צלילים שמנוגנים בזה אחר זה, בניגוד לאקורדים עצמם, שבהם הצלילים מנוגנים יחד). לאחר מכן, בכל צמד אקורדים שתשמעו, האקורד הראשון יהיה האקורד המשמעותי, אליו עליכם להתייחס. עליכם לזהות את סוג האקורד הראשון שמושמע מתוך הצמד, וללחוץ עליו במהירות האפשרית. ניתן ללחוץ על לחצן הרמקול בכדי להאזין לאקורד שוב (עד פעמיים נוספות).</p>;
+    }
+    else {
+      info = <p>מיד תשמעו צמדי אקורדים. לפני כל צמד אקורדים תשמעו סולם עולה ויורד (צלילים שמנוגנים בזה אחר זה, בניגוד לאקורדים עצמם, שבהם הצלילים מנוגנים יחד). לאחר מכן, בכל צמד אקורדים שתשמעו, האקורד הראשון יהיה האקורד המשמעותי, אליו עליכם להתייחס. עליכם לזהות את סוג האקורד הראשון שמושמע מתוך הצמד, וללחוץ עליו במהירות האפשרית.</p>;
+    }
     break;
   }
-  return <InfoScreen info={info} next={next} />;
+
+  const info_div = <div>{info}</div>;
+  return <InfoScreen info={info_div} next={next} />;
 };
 
 class TestBlock extends React.Component {
+  trial_num = 16
+
   state = {
     trial_idx: 0,
     show_info: true,
     loading: true,
+    replay_count: 2,
+    is_playing: true,
   }
 
-  constructor({test_num, test_idx, chord_button_labels, next, data}) {
+  constructor({test_num, test_idx, is_free, chord_button_labels, next, data}) {
     super();
     this.test_num = test_num;
     this.test_idx = test_idx;
+    this.is_free = is_free;
     this.chord_button_labels = chord_button_labels;
     this.next = next;
     this.data = data;
-    this.ls_prefix = "test_subtests_testblock" + test_num + "_";
+    this.ls_prefix = "test_subtests_" + (is_free ? "free" : "fast") + "_testblock" + test_num + "_";
 
     this.test_data = audio_mapping[test_num];
 
@@ -72,13 +81,16 @@ class TestBlock extends React.Component {
       ls.set(this.ls_prefix + "show_info", this.state.show_info);
     }
 
+    console.log("Trial sequence:");
+    console.log(this.sequence);
+
     const that = this;
     const doneLoadingAudio = () => {
       that.setState({loading: false});
-      
     };
 
     const donePlaying = () => {
+      that.setState({is_playing: false});
     };
 
     this.audioController = new AudioController(this.sequence.map(d => d[0]), doneLoadingAudio, donePlaying);
@@ -95,44 +107,42 @@ class TestBlock extends React.Component {
   make_test_sequence = (test_num) => {
     switch (test_num) {
     case 0:
-      return shuffleArray(this.test_data);      
-    case 1:      
-      return this.make_subtest_b_seq();
-    case 2:
-      return randomSequence(this.test_data, 32);
-    case 3:       
-      return this.make_subtest_d_seq();
+      return this.make_subtest_a_seq();
+    case 1:
+      return shuffleArray(this.test_data);
+    case 2:       
+      return this.make_subtest_c_seq();
     default:
       return null;
     }
   }
   
-  pick_unique_two = arr => {
-    const fst_idx = randomInt(0, arr.length-1);
-    const fst = arr[fst_idx];
-    const snd = randomElement(arr.slice(0, fst_idx).concat(arr.slice(fst_idx+1, arr.length)));
-    return [fst, snd];
-  }
-
-  make_subtest_b_seq = () => {
-    let sequence = [];
+  make_subtest_a_seq = () => {
+    let sequence = [];    
+    let timbres = shuffleArray([...repeatArray([Timbres.PIANO], 8), 
+                                ...repeatArray([Timbres.GUITAR], 8)]);
+    let cur_timbre = 0;
     for (let c in Chords) {
-      for (let trnsp = 0; trnsp < 4; trnsp++) {
-        const [var1, var2] = this.pick_unique_two([1,2,3]);
-        sequence.push(this.test_data[test_b_indexing(Chords[c], trnsp, randomInt(0, 1), var1)]);
-        sequence.push(this.test_data[test_b_indexing(Chords[c], trnsp, randomInt(0, 1), var2)]);        
+      for (let trnsp=0; trnsp<4; trnsp++) {
+        sequence.push(this.test_data[test_a_indexing(Chords[c], trnsp, timbres[cur_timbre])]);
+        cur_timbre++;
       }
     }
+
     return shuffleArray(sequence);
   }
 
-  make_subtest_d_seq = () => {
+  make_subtest_c_seq = () => {
     let sequence = [];
+    let timbres = shuffleArray([...repeatArray([Timbres.PIANO], 8), 
+                                ...repeatArray([Timbres.GUITAR], 8)]);
+    let trnsps = shuffleArray(repeatArray([0,1,2,3], 16));
+    let i = 0;
+
     for (let c in Chords) {
       for (let type=0; type<4; type++) {
-        const [trnsp1, trnsp2] = this.pick_unique_two([0,1,2,3]);
-        sequence.push(this.test_data[test_d_indexing(Chords[c], trnsp1, Timbres.PIANO, type)]);
-        sequence.push(this.test_data[test_d_indexing(Chords[c], trnsp2, Timbres.GUITAR, type)]);                                     
+        sequence.push(this.test_data[test_c_indexing(Chords[c], trnsps[i], timbres[i], type)]);
+        i++;
       }
     }
     return shuffleArray(sequence);
@@ -163,7 +173,9 @@ class TestBlock extends React.Component {
     }
     else {
       this.setState({trial_idx: trial_idx + 1,
-                    show_next_trial_btn: false});      
+                     answer_received: false,
+                     replay_count: 2,
+                     is_playing: true});
       ls.set(this.ls_prefix + "trial_idx", trial_idx + 1);
       ls.set("test_data", this.data);
 
@@ -182,7 +194,7 @@ class TestBlock extends React.Component {
       subtest: this.test_num + 1,
       variant: trial_info[4],
       audio_index: trial_info[0],
-      chord_number: 32 * this.test_idx + this.state.trial_idx + 1,
+      chord_number: this.trial_num * this.test_idx + this.state.trial_idx + 1,
       chord_type: trial_info[1],
       transposition: trial_info[2] + 1,
       transposition_play_count: this.get_transposition_play_count(),
@@ -193,27 +205,50 @@ class TestBlock extends React.Component {
 
     this.data.trials.push(td);
 
-    this.setState({show_next_trial_btn: true});
+    this.setState({answer_received: true,
+                   replay_count: 0});
+  }
+
+  replay = () => {
+    const { trial_idx, replay_count } = this.state;
+    this.setState({replay_count: replay_count-1,
+                   is_playing: true});
+    this.audioController.play(this.sequence[trial_idx][0]);
   }
 
   render() {
-    const { trial_idx, show_info, loading } = this.state;
+    const { trial_idx, show_info, loading, answer_received, is_playing, replay_count } = this.state;
     if (loading)
       return <LoadingScreen />;
     else if (show_info) {
-      return <SubtestInfo test_num={this.test_num} next={this.startTrials} />;
+      return <SubtestInfo test_num={this.test_num} next={this.startTrials} is_free={this.is_free} />;
     }
     else {
-      const next_trial_button = this.state.show_next_trial_btn ?
-        <ContinueButton next={this.nextTrial} /> : null;
+      let next_trial_button = null;
+      let replay_button = null;
+      
+      if (answer_received && !is_playing) {
+        next_trial_button = (
+          <div className="center-trial-btn">
+            <ContinueButton next={this.nextTrial} className="btn-secondary"/>
+          </div>
+        );
+      }
+      else if (this.is_free && !answer_received && replay_count > 0 && !is_playing) {
+        replay_button = (
+          <div className="center-trial-btn">
+            <ReplayButton onClick={this.replay} />
+          </div>
+        );
+      }
+            
       return (
         <div className="container">
           <div className="row">          
-            <ButtonTable labels={this.chord_button_labels} values={this.chord_button_labels} next={this.processAnswer} disabled={this.state.show_next_trial_btn} key={trial_idx} />
+            <ButtonTable labels={this.chord_button_labels} values={this.chord_button_labels} next={this.processAnswer} disabled={answer_received} key={trial_idx} />
           </div>
-          <div className="next-trail-btn">
-            {next_trial_button}
-          </div>
+          {next_trial_button}
+          {replay_button}
         </div>
       );
     }
@@ -221,9 +256,7 @@ class TestBlock extends React.Component {
 }
 
 export class SubtestsBlock extends React.Component {
-  ls_prefix = "test_subtests_";
-
-  subtests_count = 4;
+  subtests_count = 3;
 
   state = {
     test_idx: 0,
@@ -239,11 +272,13 @@ export class SubtestsBlock extends React.Component {
     }
   }
 
-  constructor({data, next, button_labels}) {
+  constructor({data, next, is_free, button_labels}) {
     super();
     this.data = data;
     this.next = next;
+    this.is_free = is_free;
     this.chord_button_labels = button_labels;
+    this.ls_prefix = "test_subtests_" + (is_free ? "free_" : "fast_");
 
     const cont_test_order = ls.get(this.ls_prefix + "test_order");
     if (cont_test_order !== null) {
@@ -253,7 +288,7 @@ export class SubtestsBlock extends React.Component {
       if (cont_test_idx) this.state.test_idx = cont_test_idx;
     }
     else {
-      this.test_order = shuffleArray([0, 1, 2, 3]);
+      this.test_order = shuffleArray([0, 1, 2]);
 
       ls.set(this.ls_prefix + "test_order", this.test_order);
       ls.set(this.ls_prefix + "test_idx", this.state.test_idx);
@@ -266,7 +301,7 @@ export class SubtestsBlock extends React.Component {
     const { test_idx } = this.state;
     const test_num = this.test_order[test_idx];
     
-    return <TestBlock test_num={test_num} test_idx={test_idx}
+    return <TestBlock test_num={test_num} test_idx={test_idx} is_free={this.is_free}
                       chord_button_labels={this.chord_button_labels} 
                       next={this.nextTest} 
                       data={this.data}

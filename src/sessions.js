@@ -55,7 +55,7 @@ export const readLessonType = (conn, id) => {
 
   return gs.read(conn, SheetNames.LESSON_TYPES, "A2:B10000")
     .then(response => response.json())
-    .then(findLessonType)
+    .then(findLessonType);
 };
 
 // Return true if the last session was today. Day starts at FIRST_HOUR_OF_DAY
@@ -70,4 +70,23 @@ export const was_last_session_today = (last_session) => {
 export const does_user_sheet_exists = (conn, user_id) => {
   return gs.list_sheets(conn)
     .then(sheets => sheets.includes(user_id));
+};
+
+export const read_subject_data = (conn, id) => {
+  return gs.read(conn, SheetNames.SUBJECTS_DATA, "A2:C10000")
+    .then(response => response.json())
+    .then(data => {
+      let ret = null;
+
+      data.values.forEach(row => {
+        if (row[0] === id) {
+          ret = {
+            lesson_type: row[1],
+            chord_button_labels: JSON.parse(row[2])
+          };
+        }
+      });
+
+      return ret;
+    });
 };

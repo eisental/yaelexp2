@@ -38,14 +38,21 @@ export const InfoScreen = ({info, next}) => {
   );
 };
 
-export const Button = ({label, onClick, disabled}) => {
+export const Button = ({label, onClick, disabled, className}) => {
+  const classNameStr = className ? "btn " + className : "btn btn-primary";
+
   return disabled ? 
-    <button type="button" className="btn btn-primary" onClick={onClick} disabled>{label}</button> :
-    <button type="button" className="btn btn-primary" onClick={onClick}>{label}</button>;
+    <button type="button" className={classNameStr} onClick={onClick} disabled>{label}</button> :
+    <button type="button" className={classNameStr} onClick={onClick}>{label}</button>;
 };
 
-export const ContinueButton = ({next, disabled}) => {
-  return <Button label={Strings.continue_text} onClick={next} disabled={disabled}/>;
+export const ContinueButton = ({next, disabled, className}) => {
+  return <Button label={Strings.continue_text} onClick={next} disabled={disabled} className={className} />;
+};
+
+export const ReplayButton = ({onClick, disabled}) => {
+  const label = <img src="static_images/speaker.png" />;
+  return <Button label={label} disabled={disabled} onClick={onClick} className="btn-basic btn-replay" />;
 };
 
 /* 4 buttons in a square layout with fixation point in the middle. Each button is assigned a value to be passed to 
@@ -78,5 +85,14 @@ export const ButtonTable = ({labels, values, disabled, next}) => {
         </tr>
       </tbody>
     </table>   
+  );
+};
+
+export const ComboBox = ({id, options}) => {
+  return (
+    <select id={id} name={id} defaultValue="-">
+      <option hidden disabled value="-"></option>
+      {options.map(opt => <option value={opt} key={opt}>{opt}</option>)}
+    </select>
   );
 };

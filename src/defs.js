@@ -17,13 +17,6 @@ export const Timbres = {
   SONG: 2,
 }
 
-export const Variants = {
-  NONE: 0,
-  OPEN: 1,
-  INVERSION: 2,
-  REGISTER: 3,
-}
-
 export const StaticImages = {
   happySmiley: "static_images/happySmiley.jpg",
   sadSmiley: "static_images/sadSmiley.png",
@@ -39,6 +32,7 @@ export const Strings = {
 export const SheetNames = {
   TRAINING_SESSIONS: "TrainingSessions",
   LESSON_TYPES: "LessonTypes",
+  SUBJECTS_DATA: "SubjectsData",
 }
 
 // For MUSICAL_CONTEXT lessons. A mapping of chord name to the image and song name that goes with it.

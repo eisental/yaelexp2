@@ -19,22 +19,28 @@
     left: 0;
 }
 
-.next-trail-btn {
+.center-trial-btn {
     text-align:center;
     height: 150px;/*height needs to be set*/
     border-radius: 100px;
     width: 200px;
     margin: auto;
-    margin-top: 284px;
+    margin-top: 245px;
     position: fixed;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
+    background-color: white;
 }
 
-.next-trail-btn .btn {
+.center-trial-btn .btn-secondary {
     font-size: 2em;
+    margin-top: 40px;
+}
+
+.center-trial-btn .btn-replay {
+    margin-top: 5px;
 }
 
 .overlay-box p {
@@ -49,3 +55,6 @@
     margin-left: 0.5em;
 }
 
+.songs_form select {
+    min-width: 4em;
+}

@@ -2,12 +2,12 @@ import React from 'react';
 import '../Experiment.css';
 import './TestExperiment.css';
 import { InfoScreen, ContinueButton, ErrorScreen, LoadingScreen } from '../ui.js';
-import { Chords } from '../defs.js';
+import { LessonType, Chords } from '../defs.js';
 import { PretestBlock } from './pretest.js';
 import { SubtestsBlock } from './subtests.js';
 import { PersonalInfoScreen } from './personal_info.js';
 import ls from 'local-storage';
-import { does_user_sheet_exists } from '../sessions.js';
+import { read_subject_data, does_user_sheet_exists } from '../sessions.js';
 import gs from '../spreadsheet_io.js';
 import { shuffleArray } from '../randomize.js';
 
@@ -81,9 +81,10 @@ class TestExperiment extends React.Component {
     LOGIN: 1,
     INFO: 2,
     PRETEST: 3,
-    SUB_TESTS: 4,
-    PERSONAL_INFO: 5,
-    FINISH: 6,
+    SUB_TESTS_FREE: 4,
+    SUB_TESTS_FAST: 5,
+    PERSONAL_INFO: 6,
+    FINISH: 7,
   }
 
   state = {
@@ -96,8 +97,6 @@ class TestExperiment extends React.Component {
     id: undefined,
     trials: [],
   }
-
-  chord_button_labels = shuffleArray([Chords.BIG_MAJOR, Chords.SMALL_MAJOR, Chords.SMALL_MINOR, Chords.HALF_DIM]);
 
   nextStep = () => {
     const { step } = this.state;
@@ -117,8 +116,21 @@ class TestExperiment extends React.Component {
       does_user_sheet_exists(this.conn, this.data.id + this.sheet_suffix)
         .then(sheet_exists => {
           if (sheet_exists) {
-            this.setState({loading:false});
             ls.set(this.ls_prefix + "data", this.data);
+            read_subject_data(this.conn, this.data.id)
+              .then(subject_data => {
+                if (subject_data) {
+                  this.lesson_type = subject_data.lesson_type;
+                  this.chord_button_labels = subject_data.chord_button_labels;
+                  this.setState({loading: false});
+                }
+                else {
+                  this.setState({error: "לא ניתן לקרוא נתונים עבור נבדק " + this.data.id + "."});
+                }
+              })
+              .catch(err => {
+                this.setState({error: "לא ניתן להתחבר. בדקו את חיבור האינטרנט ונסו שוב. " + err});
+              });
           }
           else {
             this.setState({error: "גיליון מבחן עבור נבדק " + this.data.id + " לא קיים במערכת.",
@@ -137,10 +149,6 @@ class TestExperiment extends React.Component {
         
         this.data = cont_data;
         
-        const cont_button_labels = ls.get(this.ls_prefix + "chord_button_labels");
-        if (cont_button_labels)
-          this.chord_button_labels = cont_button_labels;
-
         const cont_step = ls.get(this.ls_prefix + "step");
         if (cont_step) 
           return cont_step;
@@ -148,9 +156,10 @@ class TestExperiment extends React.Component {
       else {
         console.log("clearing local storage");
         ls.clear();
-        ls.set(this.ls_prefix + "chord_button_labels", this.chord_button_labels);
       }
     }
+
+    return undefined;
   }
 
   stepChanged = (step) => {
@@ -185,7 +194,6 @@ class TestExperiment extends React.Component {
 
   render() {
     const {step} = this.state;
-    console.log("rendering step " + step);
 
     if (this.state.error) {
       return <ErrorScreen error={this.state.error} />;
@@ -196,18 +204,20 @@ class TestExperiment extends React.Component {
     else {
       switch(step) {
       case this.steps.LOGIN: 
-        return <LoginScreen next={this.nextStep} data={this.data} />;
+        return <LoginScreen next={this.nextStep} data={this.data} key={step}/>;
       case this.steps.INFO:
         const test_info = <TestInfo />;
-        return <InfoScreen info={test_info} next={this.nextStep} />;
+        return <InfoScreen info={test_info} next={this.nextStep} key={step}/>;
       case this.steps.PRETEST:
-        return <PretestBlock next={this.nextStep} button_labels={this.chord_button_labels} data={this.data} />;
-      case this.steps.SUB_TESTS:
-        return <SubtestsBlock next={this.nextStep} data={this.data} button_labels={this.chord_button_labels} />;
+        return <PretestBlock next={this.nextStep} button_labels={this.chord_button_labels} data={this.data} key={step}/>;
+      case this.steps.SUB_TESTS_FREE:
+        return <SubtestsBlock next={this.nextStep} data={this.data} button_labels={this.chord_button_labels} is_free={true} key={step} />;
+      case this.steps.SUB_TESTS_FAST:
+        return <SubtestsBlock next={this.nextStep} data={this.data} button_labels={this.chord_button_labels} is_free={false} key={step} />;
       case this.steps.PERSONAL_INFO:
-        return <PersonalInfoScreen next={this.nextStep} data={this.data} />;
+        return <PersonalInfoScreen next={this.nextStep} data={this.data} key={step} songsQuestionnaire={this.lesson_type==LessonType.MUSICAL_PIECES}/>;
       case this.steps.FINISH:
-        return <FinishScreen done_saving={this.state.done_saving} />;
+        return <FinishScreen done_saving={this.state.done_saving} key={step} />;
       default:
         return <div>???</div>;
       }
