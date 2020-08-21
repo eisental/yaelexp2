@@ -1,6 +1,5 @@
 import gs from './spreadsheet_io.js';
 import { SheetNames } from './defs.js';
-import ls from 'local-storage';
 
 const FIRST_HOUR_OF_DAY = 3; // day starts at 3 am.
 
@@ -30,7 +29,6 @@ export const writeSessionEvent = (conn, session, event, on_error) => {
   let request_data = Object.assign({event: event,
                                     time: new Date().toString()},
                                     session);
-  ls.set('session', session);
   gs.write(conn, SheetNames.TRAINING_SESSIONS, request_data)
     .catch(on_error);
 
@@ -76,17 +74,27 @@ export const read_subject_data = (conn, id) => {
   return gs.read(conn, SheetNames.SUBJECTS_DATA, "A2:C10000")
     .then(response => response.json())
     .then(data => {
-      let ret = null;
-
-      data.values.forEach(row => {
+      for (const row of data.values) {
+        console.log(row[0]);
         if (row[0] === id) {
-          ret = {
+          return {
             lesson_type: row[1],
             chord_button_labels: JSON.parse(row[2])
           };
         }
-      });
+      }
 
-      return ret;
+      return null;
     });
+};
+
+export const write_subject_data = (conn, session, on_error) => {
+  const data = {
+    id: session.id,
+    lesson_type: session.lesson_type,
+    chord_button_labels: JSON.stringify(session.chord_button_labels)
+  }
+
+  gs.write(conn, SheetNames.SUBJECTS_DATA, data)
+    .catch(on_error);
 };

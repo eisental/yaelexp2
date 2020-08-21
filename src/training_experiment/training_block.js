@@ -1,189 +1,137 @@
 import React from 'react';
 import { AudioController } from '../audio_controller.js';
-import { LessonType, Strings, StaticImages, Chords, Timbres, musical_pieces_data } from '../defs.js';
-import { InfoScreen, LoadingScreen, ContinueButton, ButtonTable } from '../ui.js';
-import { randomSequence, shuffleArray } from '../randomize.js';
+import { LessonType, Strings, StaticImages, Chords, musical_pieces_data } from '../defs.js';
+import { ReplayButton, LoadingScreen, ContinueButton, ButtonTable } from '../ui.js';
+import { randomSequence } from '../randomize.js';
+import { TrainingInfo, InfoBeforeTrainingPartB, InfoBeforeTrainingPartC } from './info.js';
 import ls from 'local-storage';
 
-// each trial entry is [audio_idx, chord, transposition, timbre]
+// each trial entry is [audio_idx, chord, transposition]
 const training_data = {
   musical_pieces: [
-    [[1, Chords.BIG_MAJOR, 0, null], [2, Chords.SMALL_MAJOR, 0, null], 
-     [3, Chords.SMALL_MINOR, 0, null], [4, Chords.HALF_DIM, 0, null]],
-    [[5, Chords.BIG_MAJOR, 0, null], [6, Chords.SMALL_MAJOR, 0, null], 
-     [7, Chords.SMALL_MINOR, 0, null], [8, Chords.HALF_DIM, 0, null]],
-    [ // piano recordings
-      [9, Chords.BIG_MAJOR, 0, Timbres.PIANO], [10, Chords.BIG_MAJOR, 1, Timbres.PIANO], 
-      [11, Chords.BIG_MAJOR, 2, Timbres.PIANO], [12, Chords.BIG_MAJOR, 3, Timbres.PIANO],
-      [13, Chords.SMALL_MAJOR, 0, Timbres.PIANO], [14, Chords.SMALL_MAJOR, 1, Timbres.PIANO],
-      [15, Chords.SMALL_MAJOR, 2, Timbres.PIANO], [16, Chords.SMALL_MAJOR, 3, Timbres.PIANO],
-      [17, Chords.SMALL_MINOR, 0, Timbres.PIANO], [18, Chords.SMALL_MINOR, 1, Timbres.PIANO], 
-      [19, Chords.SMALL_MINOR, 2, Timbres.PIANO], [20, Chords.SMALL_MINOR, 3, Timbres.PIANO],
-      [21, Chords.HALF_DIM, 0, Timbres.PIANO], [22, Chords.HALF_DIM, 1, Timbres.PIANO], 
-      [23, Chords.HALF_DIM, 2, Timbres.PIANO], [24, Chords.HALF_DIM, 3, Timbres.PIANO],
-      // guitar recordings
-      [41, Chords.BIG_MAJOR, 0, Timbres.GUITAR], [42, Chords.BIG_MAJOR, 1, Timbres.GUITAR], 
-      [43, Chords.BIG_MAJOR, 2, Timbres.GUITAR], [44, Chords.BIG_MAJOR, 3, Timbres.GUITAR],
-      [45, Chords.SMALL_MAJOR, 0, Timbres.GUITAR], [46, Chords.SMALL_MAJOR, 1, Timbres.GUITAR], 
-      [47, Chords.SMALL_MAJOR, 2, Timbres.GUITAR], [48, Chords.SMALL_MAJOR, 3, Timbres.GUITAR],
-      [49, Chords.SMALL_MINOR, 0, Timbres.GUITAR], [50, Chords.SMALL_MINOR, 1, Timbres.GUITAR], 
-      [51, Chords.SMALL_MINOR, 2, Timbres.GUITAR], [52, Chords.SMALL_MINOR, 3, Timbres.GUITAR],
-      [53, Chords.HALF_DIM, 0, Timbres.GUITAR], [54, Chords.HALF_DIM, 1, Timbres.GUITAR], 
-      [55, Chords.HALF_DIM, 2, Timbres.GUITAR], [56, Chords.HALF_DIM, 3, Timbres.GUITAR],
-    ],
+    [[1, Chords.BIG_MAJOR, 0], [2, Chords.SMALL_MAJOR, 0], // part 1
+     [3, Chords.SMALL_MINOR, 0], [4, Chords.HALF_DIM, 0]],
+
+    [[5, Chords.BIG_MAJOR, 0], [6, Chords.SMALL_MAJOR, 0], // part 2
+     [7, Chords.SMALL_MINOR, 0], [8, Chords.HALF_DIM, 0],
+     [9, Chords.BIG_MAJOR, 1], [12, Chords.SMALL_MAJOR, 1], 
+     [15, Chords.SMALL_MINOR, 1], [18, Chords.HALF_DIM, 1],
+     [10, Chords.BIG_MAJOR, 2], [13, Chords.SMALL_MAJOR, 2], 
+     [16, Chords.SMALL_MINOR, 2], [19, Chords.HALF_DIM, 2],
+     [11, Chords.BIG_MAJOR, 3], [14, Chords.SMALL_MAJOR, 3], 
+     [17, Chords.SMALL_MINOR, 3], [20, Chords.HALF_DIM, 3]],
+
+    [[1021, Chords.BIG_MAJOR, 0], [1022, Chords.BIG_MAJOR, 1], // part 3
+     [1023, Chords.BIG_MAJOR, 2], [1024, Chords.BIG_MAJOR, 3],
+     [1025, Chords.SMALL_MAJOR, 0], [1026, Chords.SMALL_MAJOR, 1],
+     [1027, Chords.SMALL_MAJOR, 2], [1028, Chords.SMALL_MAJOR, 3],
+     [1029, Chords.SMALL_MINOR, 0], [1030, Chords.SMALL_MINOR, 1], 
+     [1031, Chords.SMALL_MINOR, 2], [1032, Chords.SMALL_MINOR, 3],
+     [1033, Chords.HALF_DIM, 0], [1034, Chords.HALF_DIM, 1], 
+     [1035, Chords.HALF_DIM, 2], [1036, Chords.HALF_DIM, 3]],
   ],
   tonal_context: [
-    [ // piano
-      [25, Chords.BIG_MAJOR, 0, Timbres.PIANO], [26, Chords.SMALL_MAJOR, 0, Timbres.PIANO],
-      [27, Chords.SMALL_MINOR, 0, Timbres.PIANO], [28, Chords.HALF_DIM, 0, Timbres.PIANO],
-      // guitar
-      [29, Chords.BIG_MAJOR, 0, Timbres.GUITAR], [30, Chords.SMALL_MAJOR, 0, Timbres.GUITAR],
-      [31, Chords.SMALL_MINOR, 0, Timbres.GUITAR], [32, Chords.HALF_DIM, 0, Timbres.GUITAR],
-    ],
-    [ // piano
-      [33, Chords.BIG_MAJOR, 0, Timbres.PIANO], [35, Chords.SMALL_MAJOR, 0, Timbres.PIANO],
-      [37, Chords.SMALL_MINOR, 0, Timbres.PIANO], [39, Chords.HALF_DIM, 0, Timbres.PIANO],
-      // guitar
-      [34, Chords.BIG_MAJOR, 0, Timbres.GUITAR], [36, Chords.SMALL_MAJOR, 0, Timbres.GUITAR],
-      [38, Chords.SMALL_MINOR, 0, Timbres.GUITAR], [40, Chords.HALF_DIM, 0, Timbres.GUITAR],
-    ],
-    [ // piano recordings
-      [9, Chords.BIG_MAJOR, 0, Timbres.PIANO], [10, Chords.BIG_MAJOR, 1, Timbres.PIANO], 
-      [11, Chords.BIG_MAJOR, 2, Timbres.PIANO], [12, Chords.BIG_MAJOR, 3, Timbres.PIANO],
-      [13, Chords.SMALL_MAJOR, 0, Timbres.PIANO], [14, Chords.SMALL_MAJOR, 1, Timbres.PIANO],
-      [15, Chords.SMALL_MAJOR, 2, Timbres.PIANO], [16, Chords.SMALL_MAJOR, 3, Timbres.PIANO],
-      [17, Chords.SMALL_MINOR, 0, Timbres.PIANO], [18, Chords.SMALL_MINOR, 1, Timbres.PIANO], 
-      [19, Chords.SMALL_MINOR, 2, Timbres.PIANO], [20, Chords.SMALL_MINOR, 3, Timbres.PIANO],
-      [21, Chords.HALF_DIM, 0, Timbres.PIANO], [22, Chords.HALF_DIM, 1, Timbres.PIANO], 
-      [23, Chords.HALF_DIM, 2, Timbres.PIANO], [24, Chords.HALF_DIM, 3, Timbres.PIANO],
-      // guitar recordings
-      [41, Chords.BIG_MAJOR, 0, Timbres.GUITAR], [42, Chords.BIG_MAJOR, 1, Timbres.GUITAR], 
-      [43, Chords.BIG_MAJOR, 2, Timbres.GUITAR], [44, Chords.BIG_MAJOR, 3, Timbres.GUITAR],
-      [45, Chords.SMALL_MAJOR, 0, Timbres.GUITAR], [46, Chords.SMALL_MAJOR, 1, Timbres.GUITAR], 
-      [47, Chords.SMALL_MAJOR, 2, Timbres.GUITAR], [48, Chords.SMALL_MAJOR, 3, Timbres.GUITAR],
-      [49, Chords.SMALL_MINOR, 0, Timbres.GUITAR], [50, Chords.SMALL_MINOR, 1, Timbres.GUITAR], 
-      [51, Chords.SMALL_MINOR, 2, Timbres.GUITAR], [52, Chords.SMALL_MINOR, 3, Timbres.GUITAR],
-      [53, Chords.HALF_DIM, 0, Timbres.GUITAR], [54, Chords.HALF_DIM, 1, Timbres.GUITAR], 
-      [55, Chords.HALF_DIM, 2, Timbres.GUITAR], [56, Chords.HALF_DIM, 3, Timbres.GUITAR],
-    ],
+    [[37, Chords.BIG_MAJOR, 0], [38, Chords.SMALL_MAJOR, 0], // part 1
+     [39, Chords.SMALL_MINOR, 0], [40, Chords.HALF_DIM, 0]],
+
+    [[41, Chords.BIG_MAJOR, 0], [42, Chords.SMALL_MAJOR, 0], // part 2
+     [43, Chords.SMALL_MINOR, 0], [44, Chords.HALF_DIM, 0],
+     [45, Chords.BIG_MAJOR, 1], [48, Chords.SMALL_MAJOR, 1],
+     [51, Chords.SMALL_MINOR, 1], [54, Chords.HALF_DIM, 1],
+     [46, Chords.BIG_MAJOR, 2], [49, Chords.SMALL_MAJOR, 2],
+     [52, Chords.SMALL_MINOR, 2], [55, Chords.HALF_DIM, 2],
+     [47, Chords.BIG_MAJOR, 3], [50, Chords.SMALL_MAJOR, 3],
+     [53, Chords.SMALL_MINOR, 3], [56, Chords.HALF_DIM, 3]],
+    
+    [[21, Chords.BIG_MAJOR, 0], [22, Chords.BIG_MAJOR, 1],  // part 3
+      [23, Chords.BIG_MAJOR, 2], [24, Chords.BIG_MAJOR, 3],
+      [25, Chords.SMALL_MAJOR, 0], [26, Chords.SMALL_MAJOR, 1],
+      [27, Chords.SMALL_MAJOR, 2], [28, Chords.SMALL_MAJOR, 3],
+      [29, Chords.SMALL_MINOR, 0], [30, Chords.SMALL_MINOR, 1], 
+      [31, Chords.SMALL_MINOR, 2], [32, Chords.SMALL_MINOR, 3],
+      [33, Chords.HALF_DIM, 0], [34, Chords.HALF_DIM, 1], 
+      [35, Chords.HALF_DIM, 2], [36, Chords.HALF_DIM, 3]],
   ],
   automatic: [
-    [ // piano
-      [9, Chords.BIG_MAJOR, 0, Timbres.PIANO], [13, Chords.SMALL_MAJOR, 0, Timbres.PIANO],
-      [17, Chords.SMALL_MINOR, 0, Timbres.PIANO], [21, Chords.HALF_DIM, 0, Timbres.PIANO],
-      // guitar
-      [41, Chords.BIG_MAJOR, 0, Timbres.GUITAR], [45, Chords.SMALL_MAJOR, 0, Timbres.GUITAR],
-      [49, Chords.SMALL_MINOR, 0, Timbres.GUITAR], [53, Chords.HALF_DIM, 0, Timbres.GUITAR],
-    ],
-    [ // piano
-      [9, Chords.BIG_MAJOR, 0, Timbres.PIANO], [13, Chords.SMALL_MAJOR, 0, Timbres.PIANO],
-      [17, Chords.SMALL_MINOR, 0, Timbres.PIANO], [21, Chords.HALF_DIM, 0, Timbres.PIANO],
-      // guitar
-      [41, Chords.BIG_MAJOR, 0, Timbres.GUITAR], [45, Chords.SMALL_MAJOR, 0, Timbres.GUITAR],
-      [49, Chords.SMALL_MINOR, 0, Timbres.GUITAR], [53, Chords.HALF_DIM, 0, Timbres.GUITAR],
-    ],
-    [ // piano recordings
-      [9, Chords.BIG_MAJOR, 0, Timbres.PIANO], [10, Chords.BIG_MAJOR, 1, Timbres.PIANO], 
-      [11, Chords.BIG_MAJOR, 2, Timbres.PIANO], [12, Chords.BIG_MAJOR, 3, Timbres.PIANO],
-      [13, Chords.SMALL_MAJOR, 0, Timbres.PIANO], [14, Chords.SMALL_MAJOR, 1, Timbres.PIANO],
-      [15, Chords.SMALL_MAJOR, 2, Timbres.PIANO], [16, Chords.SMALL_MAJOR, 3, Timbres.PIANO],
-      [17, Chords.SMALL_MINOR, 0, Timbres.PIANO], [18, Chords.SMALL_MINOR, 1, Timbres.PIANO], 
-      [19, Chords.SMALL_MINOR, 2, Timbres.PIANO], [20, Chords.SMALL_MINOR, 3, Timbres.PIANO],
-      [21, Chords.HALF_DIM, 0, Timbres.PIANO], [22, Chords.HALF_DIM, 1, Timbres.PIANO], 
-      [23, Chords.HALF_DIM, 2, Timbres.PIANO], [24, Chords.HALF_DIM, 3, Timbres.PIANO],
-      // guitar recordings
-      [41, Chords.BIG_MAJOR, 0, Timbres.GUITAR], [42, Chords.BIG_MAJOR, 1, Timbres.GUITAR], 
-      [43, Chords.BIG_MAJOR, 2, Timbres.GUITAR], [44, Chords.BIG_MAJOR, 3, Timbres.GUITAR],
-      [45, Chords.SMALL_MAJOR, 0, Timbres.GUITAR], [46, Chords.SMALL_MAJOR, 1, Timbres.GUITAR], 
-      [47, Chords.SMALL_MAJOR, 2, Timbres.GUITAR], [48, Chords.SMALL_MAJOR, 3, Timbres.GUITAR],
-      [49, Chords.SMALL_MINOR, 0, Timbres.GUITAR], [50, Chords.SMALL_MINOR, 1, Timbres.GUITAR], 
-      [51, Chords.SMALL_MINOR, 2, Timbres.GUITAR], [52, Chords.SMALL_MINOR, 3, Timbres.GUITAR],
-      [53, Chords.HALF_DIM, 0, Timbres.GUITAR], [54, Chords.HALF_DIM, 1, Timbres.GUITAR], 
-      [55, Chords.HALF_DIM, 2, Timbres.GUITAR], [56, Chords.HALF_DIM, 3, Timbres.GUITAR],
-    ],
+    [[21, Chords.BIG_MAJOR, 0], [25, Chords.SMALL_MAJOR, 0], // part 1
+     [29, Chords.SMALL_MINOR, 0], [33, Chords.HALF_DIM, 0]],
+
+    [[21, Chords.BIG_MAJOR, 0], [22, Chords.BIG_MAJOR, 1], // part 2
+     [23, Chords.BIG_MAJOR, 2], [24, Chords.BIG_MAJOR, 3],
+     [25, Chords.SMALL_MAJOR, 0], [26, Chords.SMALL_MAJOR, 1],
+     [27, Chords.SMALL_MAJOR, 2], [28, Chords.SMALL_MAJOR, 3],
+     [29, Chords.SMALL_MINOR, 0], [30, Chords.SMALL_MINOR, 1],
+     [31, Chords.SMALL_MINOR, 2], [32, Chords.SMALL_MINOR, 3],
+     [33, Chords.HALF_DIM, 0], [34, Chords.HALF_DIM, 1],
+     [35, Chords.HALF_DIM, 2], [36, Chords.HALF_DIM, 3]],
+
+    [[21, Chords.BIG_MAJOR, 0], [22, Chords.BIG_MAJOR, 1], // part 3
+     [23, Chords.BIG_MAJOR, 2], [24, Chords.BIG_MAJOR, 3],
+     [25, Chords.SMALL_MAJOR, 0], [26, Chords.SMALL_MAJOR, 1],
+     [27, Chords.SMALL_MAJOR, 2], [28, Chords.SMALL_MAJOR, 3],
+     [29, Chords.SMALL_MINOR, 0], [30, Chords.SMALL_MINOR, 1],
+     [31, Chords.SMALL_MINOR, 2], [32, Chords.SMALL_MINOR, 3],
+     [33, Chords.HALF_DIM, 0], [34, Chords.HALF_DIM, 1],
+     [35, Chords.HALF_DIM, 2], [36, Chords.HALF_DIM, 3]]    
   ],
 };
 
-const correction_data = {
-  [LessonType.MUSICAL_PIECES]: [
-    {[Chords.BIG_MAJOR]: 9, [Chords.SMALL_MAJOR]: 13, [Chords.SMALL_MINOR]: 17, [Chords.HALF_DIM]: 21 },
-    {[Chords.BIG_MAJOR]: 9, [Chords.SMALL_MAJOR]: 13, [Chords.SMALL_MINOR]: 17, [Chords.HALF_DIM]: 21 },
-    null,
-  ],
-  [LessonType.TONAL_CONTEXT]: [
-    {[Chords.BIG_MAJOR]: 9, [Chords.SMALL_MAJOR]: 13, [Chords.SMALL_MINOR]: 17, [Chords.HALF_DIM]: 21 },
-    {[Chords.BIG_MAJOR]: 9, [Chords.SMALL_MAJOR]: 13, [Chords.SMALL_MINOR]: 17, [Chords.HALF_DIM]: 21 },
-    null,
-  ],
-  [LessonType.AUTOMATIC]: [null, null, null]
+const correction_suffixes = {
+  [Chords.BIG_MAJOR]: "A",
+  [Chords.SMALL_MAJOR]: "B",
+  [Chords.SMALL_MINOR]: "C",
+  [Chords.HALF_DIM]: "D",
 };
 
-const TrainingInfo = props => {
-  let { lesson_type, next } = props;
-  let info;
-  switch (lesson_type) {
-  case LessonType.MUSICAL_PIECES:
-    info = (
-      <div>
-      <p>בחלק זה תשמעו קטעים מוזיקליים ותצטרכו לזהות את האקורד הראשון שלהם. בדומה לחלק הקודם, האקורד יושמע גם אחרי הקטע המוזיקלי.</p>
-      <p>עליכם לזהות את סוג האקורד במהירות האפשרית, וללחוץ עליו באמצעות העכבר.</p>
-      </div>);
-    break;
-  case LessonType.TONAL_CONTEXT:
-    info = (
-      <div>
-        <p>בחלק זה תשמעו צמדים מוזיקליים לאחר מבוא טונאלי של סולם עולה ויורד, ותצטרכו לזהות את האקורד הראשון בכל צמד.</p>
-        <p>עליכם לזהות את סוג האקורד במהירות האפשרית, וללחוץ עליו באמצעות העכבר.</p>
-      </div>);
-    break;
-  case LessonType.AUTOMATIC:
-    info = (
-      <div>
-        <p>בחלק זה תשמעו אקורדים בודדים, ותצטרכו לזהות אותם במהירות האפשרית, וללחוץ על סוג האקורד.</p>
-      </div>);
+const musical_pieces_correction_data = {
+  [Chords.BIG_MAJOR]: 1, 
+  [Chords.SMALL_MAJOR]: 2, 
+  [Chords.SMALL_MINOR]: 3, 
+  [Chords.HALF_DIM]: 4 
+};
+
+const TrainingScreen = ({chord, lesson_type, lesson_part, chord_button_labels, is_free, 
+                         answer_received, replay_count, is_playing, next, replay}) => {
+  let song_image = null;
+  let desc_line1 = "\u00a0";
+  let desc_line2 = "\u00a0";
+
+  if (lesson_part === 0 && lesson_type === LessonType.MUSICAL_PIECES) {
+    const song_data = musical_pieces_data[chord];
+    desc_line1 = "שם השיר:";
+    desc_line2 = song_data.name;
+
+    song_image = (
+      <div className="row text-center">
+        <img className="center-chord-image" src={song_data.imgSrc} alt=""/>
+      </div>
+    );
   }
-  return <InfoScreen next={next} info={info}/>;
+
+  const replay_button = (is_free && !answer_received && replay_count > 0 && !is_playing) ? (
+    <div className="center-lesson-btn">
+      <ReplayButton onClick={replay} />
+    </div>
+  ) : null;
+
+  return (
+    <div className="container">
+      <div className="row">
+        <div className="col-12 center-block text-center">
+          <p className="chordName">{desc_line1}</p>
+          <p className="chordName">{desc_line2}</p>
+        </div>
+      </div>
+      <div className="row lesson-button-table">
+        <ButtonTable labels={chord_button_labels} values={chord_button_labels} next={next} disabled={answer_received}/>
+      </div>
+      {song_image}
+      {replay_button}
+    </div>
+  );
 };
 
-const InfoBeforeTrainingPartB = props => {
-  let { lesson_type, next } = props;
-  let info;
-  switch (lesson_type) {
-  case LessonType.MUSICAL_PIECES:
-    info = (
-      <div>
-        <p>בחלק זה תשמעו קטעים זהים, אך הפעם בביצוע של חליל ופסנתר, ותצטרכו לזהות את האקורד המושמע בליווי.</p>
-        <p>עליכם לזהות את סוג האקורד במהירות האפשרית, וללחוץ עליו באמצעות העכבר.</p>
-      </div>);
-    break;
-  case LessonType.TONAL_CONTEXT:
-    info = <p>בחלק זה תשמעו מבוא טונאלי ואחריו אקורד בודד. תצטרכו לזהות את האקורד הבודד במהירות האפשרית, וללחוץ על סוג האקורד.</p>;
-    break;
-  case LessonType.AUTOMATIC:
-    info = <p>תזכורת: בחלק זה תשמעו אקורדים בודדים, ותצטרכו לזהות אותם במהירות האפשרית, וללחוץ על סוג האקורד.</p>;
-    break;
-  }
-  return <InfoScreen info={info} next={next}/>;
-};
-
-const InfoBeforeTrainingPartC = props => {
-  let { lesson_type, next } = props;
-  let info;
-  switch (lesson_type) {
-  case LessonType.MUSICAL_PIECES:
-    info = <p>בחלק זה תשמעו אקורדים בודדים, ללא הקטע המוזיקלי, ותצטרכו לזהות אותם במהירות האפשרית, וללחוץ על סוג האקורד.</p>;
-    break;
-  case LessonType.TONAL_CONTEXT:
-    info = <p>בחלק זה תשמעו אקורדים בודדים, ללא הקטע המוזיקלי, ותצטרכו לזהות אותם במהירות האפשרית, וללחוץ על סוג האקורד.</p>;
-    break;
-  case LessonType.AUTOMATIC:
-    info = <p>תזכורת: בחלק זה תשמעו אקורדים בודדים, ותצטרכו לזהות אותם במהירות האפשרית, וללחוץ על סוג האקורד.</p>;
-    break;
-  }
-  return <InfoScreen info={info} next={next}/>;
-};
-
-const SuccessfulIdentification = props => {
+const CorrectFeedbackScreen = props => {
   const { next } = props;
   return (
     <div className="row successScreenWrapper">
@@ -198,7 +146,7 @@ const SuccessfulIdentification = props => {
   );
 };
 
-const FailedIdentification = props => {
+const IncorrectFeedbackScreen = props => {
   const { shouldShowCorrect, shouldShowButton, correctChord, lesson_type, part, next} = props;
 
   let appendix;
@@ -239,68 +187,24 @@ const FailedIdentification = props => {
   );
 };
 
-const SongWithChords = props => {
-  const { songData, chord_buttons, disabled, next } = props;
-
-  const gen_button = (chord, i) => {
-    if (disabled) 
-      return <td key={i}><button className="chordBtn" disabled key={i} onClick={(e) => next(chord)}>{chord}</button></td>;
-    else 
-      return <td key={i}><button className="chordBtn" key={i} onClick={(e) => next(chord)}>{chord}</button></td>;
-  };
-
-  return (
-    <div className="songDisplayWrapper">
-      <img className="songImage" src={ songData.imgSrc } alt=""/>
-      <div className="row">
-        <div className="col text-center songTitle">
-          שם השיר:
-          <br/>
-          { songData.name }
-          <br/>
-          <br/>
-          שם האקורד:
-        </div>
-
-      </div>
-      <div className="row chordsTable text-center">
-        <div className="col text-center chords">
-          <table className="chordsTable text-center">
-            <tbody>
-              <tr>
-                {chord_buttons.map((chord, i) => gen_button(chord, i))}
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const ChordSelection = ({chord_buttons, disabled, with_song_names, next}) => {
-  const labels = chord_buttons.map(chord => with_song_names ? 
-                                   <p>{chord} <br/> {musical_pieces_data[chord].name}</p> : 
-                                   <p>{chord}</p>);
-
-  return <ButtonTable labels={labels} values={chord_buttons} disabled={disabled} next={next} />;
-};
-
 class TrainingPart extends React.Component {
   state = {
     trial_idx: 0,
     done_loading: false,
-    done_playing: false,
-    show_feedback: false,
-    answer: null,
+    is_playing_trial: true,
+    is_playing_incorrect: false,
+    is_playing_correct: false,
+    answer_received: false,
+    replay_count: 2,
   };
 
-  trials_per_part = 32;
+  trials_per_part = 16;
 
-  constructor({part, session, chord_buttons, next, data}) {
+  constructor({part, session, is_free, chord_buttons, next, data}) {
     super();
     this.part = part;
     this.session = session;
+    this.is_free = is_free;
     this.chord_buttons = chord_buttons;
     this.next = next;
     this.data = data;
@@ -329,43 +233,53 @@ class TrainingPart extends React.Component {
       ls.set(this.ls_prefix + "sequence", this.sequence);
       ls.set(this.ls_prefix + "trial_idx", this.state.trial_idx);
     }
-//    console.log("TRAINING PART " + part + " sequence:");
-//    console.log(this.sequence);
 
-    const that = this;
-    const doneLoadingAudio = () => {
-      that.setState({done_loading: true});
-      that.audioController.play(that.sequence[that.state.trial_idx][0]);
-      that.response_start = new Date();
-    };
+    console.log("Training sequence for part " + this.part + ":");
+    console.log(this.sequence);
 
-    const donePlaying = () => {
-      that.setState({done_playing: true});
-      
-      // this part runs when we give feedback for an incorrect answer.
-      if (this.state.show_feedback) {
-        if (!this.state.fail_show_correct) {
-          // play the correct answer audio idx
-          this.audioController.play(this.state.correct_audio_idx);
-          this.setState({fail_show_correct: true});
-        } else {
-          // done playing feedback, show continue button.
-          this.setState({done_playing_correct_feedback: true});
+    const gen_letters_correction_list = (add_correct) => {
+      return this.part_data.map(d => {
+        let l = [];
+        const idx = d[0] < 1000 ? d[0] : d[0] - 1000;
+
+        for (const chord in correction_suffixes) {
+          if (chord !== d[1])
+            l.push(idx + correction_suffixes[chord]);
         }
-      }
-    };
+        if (add_correct)
+          l.push(idx + "Correct");
 
-    let correction_idxs = [];
-    const corrections_for_part = correction_data[this.session.lesson_type][this.part];
-    if (corrections_for_part !== null) {
-      for (const chord in corrections_for_part)
-        correction_idxs.push(corrections_for_part[chord]);
+        if (d[0] >= 1000)
+          l.push(idx);
+
+        return l;
+      }).flat();
+    };
+    
+    let feedback_idxs = null;
+    
+    switch (this.session.lesson_type) {
+    case LessonType.MUSICAL_PIECES:
+      if (part === 0) {
+        feedback_idxs = [1, 2, 3, 4];
+      }
+      else {
+        feedback_idxs = gen_letters_correction_list(false);
+      }
+      break;
+    case LessonType.TONAL_CONTEXT:
+      feedback_idxs = gen_letters_correction_list(part < 2);
+      break;
+    case LessonType.AUTOMATIC:
+      feedback_idxs = gen_letters_correction_list(false);
+      break;
     }
 
-    this.audioController = new AudioController(correction_idxs.concat(this.part_data.map(d => d[0])), doneLoadingAudio, donePlaying);
+    this.audioController = new AudioController(feedback_idxs.concat(this.part_data.map(d => d[0])), 
+                                               this.doneLoadingAudio, this.donePlaying);
   }
 
-  /* calculate the transposition count since the beginning of training (currently of part). */
+  /* calculate the transposition count since the beginning of part. */
   get_transposition_play_count() { 
     const idx = this.state.trial_idx;
     const trial = this.sequence[idx];
@@ -374,101 +288,149 @@ class TrainingPart extends React.Component {
     return count_in_part;
   }
 
-  render() {
-    const that = this;
+  doneLoadingAudio = () => {
+    this.setState({done_loading: true});
+    this.audioController.play(this.sequence[this.state.trial_idx][0]);
+    this.response_start = new Date();
+  };
+
+  donePlaying = () => {
+    if (this.state.is_playing_trial) {
+      // finished playing trial audio.
+      this.setState({is_playing_trial: false});
+      if (this.state.answer_received) {
+        if (!this.state.correct) {
+          this.audioController.play(this.state.selected_audio_idx);
+        }
+      }
+    }
+    else {
+      // finished playing correct or incorrect
+      if (this.state.is_playing_incorrect) {
+        // play the correct answer audio idx
+        this.audioController.play(this.state.correct_audio_idx);
+        this.setState({is_playing_correct: true,
+                       is_playing_incorrect: false});
+      } else if (this.state.is_playing_correct) {
+        // done playing feedback, show continue button.
+        this.setState({done_playing_correct_feedback: true,
+                       is_playing_correct: false});
+      }
+    }
+  }
+
+  replay = () => {
+    const { trial_idx, replay_count } = this.state;
+    this.setState({replay_count: replay_count-1, is_playing_trial: true});
+    this.audioController.play(this.sequence[trial_idx][0]);
+  }
+
+  nextTrial = () => {
+    const trial_idx = this.state.trial_idx;
+    if (trial_idx < this.trials_per_part - 1) {
+      this.audioController.play(this.sequence[trial_idx+1][0]);
+      this.setState({trial_idx: trial_idx + 1,
+                     is_playing_trial: true,
+                     answer_received: false});
+      this.response_start = new Date(); // RT measurement
+    }
+    else {
+      this.next();
+    }
+  }
+
+  processAnswer = (answer) => {
     const trial_data = this.sequence[this.state.trial_idx];
     const chord_name = trial_data[1];
     const transposition = trial_data[2];
 
-    const nextTrial = () => {
-      const trial_idx = that.state.trial_idx;
-      if (trial_idx < that.trials_per_part - 1) {
-        that.setState({trial_idx: trial_idx + 1,
-                       done_playing: false,
-                       show_feedback: false});
-        that.audioController.play(this.sequence[trial_idx+1][0]);
-        that.response_start = new Date(); // RT measurement
+    const correct = answer === chord_name;
+
+    // save trial data
+    const td = {
+      time: new Date().toString(),
+      audio_index: trial_data[0],
+      chord_number: this.trials_per_part * this.part + this.state.trial_idx + 1,
+      chord_type: chord_name,
+      transposition: transposition + 1,
+      transposition_play_count: this.get_transposition_play_count(),
+      selected_chord_type: answer,
+      correct: correct,
+      response_time: new Date() - this.response_start,
+    };
+    this.data.trials.push(td);
+    ls.set("data", this.data);
+    if (this.state.trial_idx+1 < this.trials_per_part)
+      ls.set(this.ls_prefix + "trial_idx", this.state.trial_idx+1);
+
+    // continue to show answer feedback
+    if (!correct) {
+      // find the right selected and correct audio indices.
+
+      const c_idx = trial_data[0] < 1000 ? trial_data[0] : trial_data[0] - 1000;
+      let selected_audio_idx, correct_audio_idx;
+
+      if (this.session.lesson_type === LessonType.MUSICAL_PIECES && this.part===0) {
+        selected_audio_idx = musical_pieces_correction_data[answer];
+        correct_audio_idx = musical_pieces_correction_data[trial_data[1]];
       }
       else {
-        that.next();
+        selected_audio_idx = c_idx + correction_suffixes[answer];
+        if (this.session.lesson_type === LessonType.TONAL_CONTEXT && this.part < 2) {
+          correct_audio_idx = c_idx + "Correct";
+        }
+        else {
+          correct_audio_idx = c_idx;
+        }
       }
-    };
 
-    const processAnswer = (answer) => {
-      const correct = answer === chord_name;
-      // save trial data
-      const td = {
-        time: new Date().toString(),
-        audio_index: trial_data[0],
-        chord_number: that.trials_per_part * this.part + this.state.trial_idx + 1,
-        chord_type: chord_name,
-        transposition: transposition + 1,
-        transposition_play_count: that.get_transposition_play_count(),
-        selected_chord_type: answer,
-        correct: correct,
-        response_time: new Date() - that.response_start,
-      };
-      that.data.trials.push(td);
-      ls.set("data", that.data);
-      if (this.state.trial_idx+1 < this.trials_per_part)
-        ls.set(this.ls_prefix + "trial_idx", this.state.trial_idx+1);
-
-      // stop playback
-      that.audioController.stop(trial_data[0]);
-
-      // continue to show answer feedback
-      if (!correct) {
-        // start playing the chosen chord and then the right chord.
-        // [idx, chord, trnsp, timbre]
-
-        const corrections_for_part = correction_data[this.session.lesson_type][this.part];
-        const selected_audio_idx = corrections_for_part !== null ?
-              corrections_for_part[answer] :
-              that.part_data.filter(d => d[1] === answer && d[2] === transposition && d[3] === trial_data[3])[0][0];
-
-        const correct_audio_idx = corrections_for_part !== null ?
-              corrections_for_part[trial_data[1]] :
-              trial_data[0];
-
-        this.setState({show_feedback: true,
-                       correct: correct,
-                       fail_show_correct: false,
-                       done_playing_correct_feedback: false,
-                       correct_audio_idx: correct_audio_idx});
-        that.audioController.play(selected_audio_idx);
+      if (!this.state.is_playing_trial) {
+        this.audioController.play(selected_audio_idx);
       }
-      else {        
-        that.setState({show_feedback: true,
-                       correct: correct});
-      }
-    };
-    
-    if (!this.state.done_loading) 
-      return <LoadingScreen />;
 
-    if (!this.state.show_feedback) {
-      let screen;
-      if (this.part === 0 && this.session.lesson_type === LessonType.MUSICAL_PIECES) {
-        const song_data = musical_pieces_data[chord_name];
-        screen = <SongWithChords songData={song_data} chord_buttons={this.chord_buttons} next={processAnswer}/>;
-      }
-      else {
-        screen = <ChordSelection chord_buttons={this.chord_buttons} next={processAnswer}/>;
-      }
-      
-      return (
-        <div className="container">
-          {screen}
-        </div>
-      );
+      this.setState({answer_received: true,
+                     correct: correct,
+                     is_playing_incorrect: true,
+                     is_playing_correct: false,
+                     done_playing_correct_feedback: false,
+                     correct_audio_idx: correct_audio_idx,
+                     selected_audio_idx: selected_audio_idx});
+
     }
-    else { // show feedback screen
+    else {        
+      this.setState({answer_received: true,
+                     correct: correct});
+    }
+  }
+
+  render() {
+    const trial_data = this.sequence[this.state.trial_idx];
+    const chord_name = trial_data[1];
+    const transposition = trial_data[2];
+    
+    if (!this.state.done_loading) {
+      return <LoadingScreen />;
+    }
+
+    else if (this.state.answer_received && !this.state.is_playing_trial) {
+      // show feedback screen
       if (this.state.correct) {
-        return <SuccessfulIdentification next={nextTrial}/>;
+        return <CorrectFeedbackScreen next={this.nextTrial}/>;
       } else {
-        this.nextTrial = nextTrial;
-        return <FailedIdentification shouldShowCorrect={this.state.fail_show_correct} shouldShowButton={this.state.done_playing_correct_feedback} correctChord={chord_name} lesson_type={this.session.lesson_type} next={nextTrial} part={this.part}/>;
+        return <IncorrectFeedbackScreen shouldShowCorrect={!this.state.is_playing_incorrect} 
+                                        shouldShowButton={this.state.done_playing_correct_feedback} 
+                                        correctChord={chord_name} lesson_type={this.session.lesson_type} 
+                                        next={this.nextTrial} part={this.part}/>;
       }
+    }
+
+    else { 
+      return (
+        <TrainingScreen chord={chord_name} lesson_type={this.session.lesson_type} lesson_part={this.part} 
+                        chord_button_labels={this.chord_buttons} is_free={this.is_free} 
+                        answer_received={this.state.answer_received} replay_count={this.state.replay_count} 
+                        is_playing={this.state.is_playing_trial} next={this.processAnswer} replay={this.replay}/>
+      );
     }
   }
 };
@@ -488,32 +450,31 @@ export class TrainingBlock extends React.Component {
     step: 1,
   }
 
-  chord_buttons = shuffleArray([Chords.BIG_MAJOR, Chords.SMALL_MAJOR, Chords.SMALL_MINOR, Chords.HALF_DIM]);
-
   nextStep = () => {
     const { step } = this.state;
-    
+
     this.setState({
       step: step + 1
     });
+
     ls.set("training_block_step", step + 1);
 
     if (step + 1 === this.steps.DONE)
       this.next();
   }
 
-  constructor({data, session, next}) {
+  constructor({data, session, is_free, next}) {
     super();
     this.data = data;
     this.session = session;
     this.next = next;
+    this.chord_buttons = session.chord_button_labels;
+    this.is_free = is_free;
 
     if (session.continued) {
-      this.chord_buttons = ls.get("training_block_chord_buttons");      
       this.state.step = ls.get("training_block_step");
     }
     else {
-      ls.set("training_block_chord_buttons", this.chord_buttons);
       ls.set("training_block_step", this.state.step);
     }
   }
@@ -524,24 +485,24 @@ export class TrainingBlock extends React.Component {
     switch (step) {
     case this.steps.INFO_A:
       this.session.continued = false;
-      screen = <TrainingInfo lesson_type={this.session.lesson_type} next={this.nextStep} key={step} />;
+      screen = <TrainingInfo lesson_type={this.session.lesson_type} is_free={this.is_free} next={this.nextStep} key={step} />;
       break;
     case this.steps.PART_A:
-      screen = <TrainingPart part={0} session={this.session} next={this.nextStep} key={step} chord_buttons={this.chord_buttons} data={this.data} />;
+      screen = <TrainingPart part={0} session={this.session} is_free={this.is_free} next={this.nextStep} key={step} chord_buttons={this.chord_buttons} data={this.data} />;
       break;
     case this.steps.INFO_B:
       this.session.continued = false;
-      screen = <InfoBeforeTrainingPartB lesson_type={this.session.lesson_type} next={this.nextStep} key={step} />;
+      screen = <InfoBeforeTrainingPartB lesson_type={this.session.lesson_type} is_free={this.is_free} next={this.nextStep} key={step} />;
       break;
     case this.steps.PART_B:
-      screen = <TrainingPart part={1} session={this.session} next={this.nextStep} key={step} chord_buttons={this.chord_buttons} data={this.data} />;
+      screen = <TrainingPart part={1} session={this.session} is_free={this.is_free} next={this.nextStep} key={step} chord_buttons={this.chord_buttons} data={this.data} />;
       break;
     case this.steps.INFO_C:
       this.session.continued = false;
-      screen = <InfoBeforeTrainingPartC lesson_type={this.session.lesson_type} next={this.nextStep} key={step} />;
+      screen = <InfoBeforeTrainingPartC lesson_type={this.session.lesson_type} is_free={this.is_free} next={this.nextStep} key={step} />;
       break;
     case this.steps.PART_C:
-      screen = <TrainingPart part={2} session={this.session} next={this.nextStep} key={step} chord_buttons={this.chord_buttons} data={this.data} />;
+      screen = <TrainingPart part={2} session={this.session} is_free={this.is_free} next={this.nextStep} key={step} chord_buttons={this.chord_buttons} data={this.data} />;
       break;
     case this.steps.DONE:
       screen = null;

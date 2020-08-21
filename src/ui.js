@@ -57,12 +57,17 @@ export const ReplayButton = ({onClick, disabled}) => {
 
 /* 4 buttons in a square layout with fixation point in the middle. Each button is assigned a value to be passed to 
    the next function when it's clicked. */
-export const ButtonTable = ({labels, values, disabled, next}) => {
+export const ButtonTable = ({labels, values, disabled, next, highlight, no_interaction}) => {
   const gen_button = (btn_idx) => {
+    const className="chordBtn" + (no_interaction ? " no_interaction" : "")
+      + (highlight===btn_idx ? " highlight" : "");
+
+    const onClick = (no_interaction ? null : (e) => next(values[btn_idx]));
+
     if (disabled) 
-      return <button className="chordBtn" disabled onClick={(e) => next(values[btn_idx])}>{labels[btn_idx]}</button>;
+      return <button className={className} disabled onClick={onClick}>{labels[btn_idx]}</button>;
     else 
-      return <button className="chordBtn" onClick={(e) => next(values[btn_idx])}>{labels[btn_idx]}</button>;
+      return <button className={className} onClick={onClick}>{labels[btn_idx]}</button>;
   };
 
   return (

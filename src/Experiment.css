@@ -25,6 +25,24 @@
     background-color: darkgray;
 }
 
+.chordBtn.no_interaction:active {
+    background-color:  #e7e7e7;;
+}
+
+.chordBtn.highlight {
+    background-color: cyan;
+}
+
+.chordBtn.highlight.animate {
+    animation: highlightAnimation 2s infinite;
+    animation-timing-function: ease-in-out;
+    border-width: 3px;
+}
+@keyframes highlightAnimation {
+	0%	  { background-color: #e7e7e7;}
+	50%  { background-color: #878787;}
+}
+
 .chordBtn p {
     margin-bottom: 0;
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { musical_pieces_data, LessonType, Chords } from '../defs.js';
 import { AudioController } from '../audio_controller.js';
-import { InfoScreen, LoadingScreen, ContinueButton } from '../ui.js';
+import { ButtonTable, InfoScreen, LoadingScreen, ContinueButton } from '../ui.js';
 import { randomSequence } from '../randomize.js';
 import ls from 'local-storage';
 
@@ -11,64 +11,68 @@ let lesson_data = {
   musical_pieces: [
     [[1, Chords.BIG_MAJOR], [2, Chords.SMALL_MAJOR], [3, Chords.SMALL_MINOR], [4, Chords.HALF_DIM]],
     [[5, Chords.BIG_MAJOR], [6, Chords.SMALL_MAJOR], [7, Chords.SMALL_MINOR], [8, Chords.HALF_DIM]],
-    [[1009, Chords.BIG_MAJOR], [1013, Chords.SMALL_MAJOR], [1017, Chords.SMALL_MINOR], [1021, Chords.HALF_DIM]],
+    [[1021, Chords.BIG_MAJOR], [1025, Chords.SMALL_MAJOR], [1029, Chords.SMALL_MINOR], [1033, Chords.HALF_DIM]],
   ],
   tonal_context: [
-    [[25, Chords.BIG_MAJOR], [26, Chords.SMALL_MAJOR], [27, Chords.SMALL_MINOR], [28, Chords.HALF_DIM]],
-    [[29, Chords.BIG_MAJOR], [30, Chords.SMALL_MAJOR], [31, Chords.SMALL_MINOR], [32, Chords.HALF_DIM]],
-    [[33, Chords.BIG_MAJOR], [35, Chords.SMALL_MAJOR], [37, Chords.SMALL_MINOR], [39, Chords.HALF_DIM],
-     [34, Chords.BIG_MAJOR], [36, Chords.SMALL_MAJOR], [38, Chords.SMALL_MINOR], [40, Chords.HALF_DIM]],
+    [[37, Chords.BIG_MAJOR], [38, Chords.SMALL_MAJOR], [39, Chords.SMALL_MINOR], [40, Chords.HALF_DIM]],
+    [[37, Chords.BIG_MAJOR], [38, Chords.SMALL_MAJOR], [39, Chords.SMALL_MINOR], [40, Chords.HALF_DIM]],
+    [[41, Chords.BIG_MAJOR], [42, Chords.SMALL_MAJOR], [43, Chords.SMALL_MINOR], [44, Chords.HALF_DIM],],
   ],
   automatic: [
-    [[9, Chords.BIG_MAJOR], [13, Chords.SMALL_MAJOR], [17, Chords.SMALL_MINOR], [21, Chords.HALF_DIM]],
-    [[41, Chords.BIG_MAJOR], [45, Chords.SMALL_MAJOR], [49, Chords.SMALL_MINOR], [53, Chords.HALF_DIM]],
-    [[41, Chords.BIG_MAJOR], [45, Chords.SMALL_MAJOR], [49, Chords.SMALL_MINOR], [53, Chords.HALF_DIM],
-     [9, Chords.BIG_MAJOR], [13, Chords.SMALL_MAJOR], [17, Chords.SMALL_MINOR], [21, Chords.HALF_DIM]],
+    [[21, Chords.BIG_MAJOR], [25, Chords.SMALL_MAJOR], [29, Chords.SMALL_MINOR], [33, Chords.HALF_DIM]],
+    [[21, Chords.BIG_MAJOR], [25, Chords.SMALL_MAJOR], [29, Chords.SMALL_MINOR], [33, Chords.HALF_DIM]],
+    [[21, Chords.BIG_MAJOR], [25, Chords.SMALL_MAJOR], [29, Chords.SMALL_MINOR], [33, Chords.HALF_DIM]]
   ],
 };
 
-// The UI for AUTOMATIC and TONAL_CONTEXT lesson trials.
-const NameOfChord = props => {
-  let { chordName, lesson_type } = props;
-  let description = "";
-  if (lesson_type === LessonType.TONAL_CONTEXT)
-    description = "שם האקורד הראשון:";
-  else if (lesson_type === LessonType.AUTOMATIC)
-    description = "שם האקורד:";
+// Component for the lesson UI.
+const LessonScreen = ({chord, lesson_type, chord_button_labels, next, show_next}) => {
+  const highlight = chord_button_labels.indexOf(chord);
+  const button_table = <ButtonTable labels={chord_button_labels} values={chord_button_labels} highlight={highlight} no_interaction />;
+
+  let next_trial_button = null;
+  if (show_next) {
+    next_trial_button = (
+      <div className="center-lesson-btn">
+        <ContinueButton next={next} className="btn-secondary" />
+      </div>
+    );
+  }
+
+  let line1, line2;
+  let song_image = null;
+
+  switch (lesson_type) {
+  case LessonType.MUSICAL_PIECES:
+    const song_data = musical_pieces_data[chord];
+    line1 = "שם השיר:";
+    line2 = song_data.name;
+    song_image = <img className="center-chord-image" src={song_data.imgSrc} alt=""/>;
+    break;
+  case LessonType.TONAL_CONTEXT:
+    line1 = "שם האקורד הראשון:";
+    line2 = chord;
+    break;
+  case LessonType.AUTOMATIC:
+    line1 = "שם האקורד:";
+    line2 = chord;
+  }
 
   return (
-    <div className = "row text-center successScreenWrapper">
-      <div className="col-sm-8 offset-sm-2 align-middle">
-        <span className="chordName">
-          {description}
-        <br />
-        { chordName }
-        </span>
-      </div>
-    </div>
-  );
-};
-
-// The UI for MUSICAL_PIECES lesson trials.
-const SongWithoutChords = props => {
-  let { chordName } = props;
-  let { songData } = props;
-  return(
-    <div className="songDisplayWrapper">
-      <img className="songImage" src={ songData.imgSrc } alt=""/>
+    <div className="container">
       <div className="row">
-        <div className="col text-center">
-          <div className="songTitle">
-            שם השיר:
-            <br/>
-            { songData.name }
-            <br/>
-            <br/>
-            שם האקורד:
-            <br/>
-            { chordName }
-          </div>
+        <div className="col-12 center-block text-center">
+          <p className="chordName">{line1}</p>
+          <p className="chordName">{line2}</p>
         </div>
+
+      </div>
+      <div className="row lesson-button-table">
+        {button_table}
+        {next_trial_button}
+      </div>
+      <div className="row text-center">
+        {song_image}
       </div>
     </div>
   );
@@ -116,9 +120,6 @@ class LessonPart extends React.Component {
       ls.set(this.ls_prefix + "trial_idx", this.state.trial_idx);
     }
 
-//    console.log("LESSON PART " + part + " sequence:");
-//    console.log(this.sequence);
-
     const that = this;
     const doneLoadingAudio = () => {
       that.setState({done_loading: true});
@@ -148,31 +149,11 @@ class LessonPart extends React.Component {
     };
 
     const trialData  = this.sequence[this.state.trial_idx];
-    const chordName = trialData[1];
-    const songData = musical_pieces_data[chordName];
+    const chord = trialData[1];
 
     if (this.state.done_loading) {
-      let screen;
-      if (this.session.lesson_type === LessonType.MUSICAL_PIECES) {
-        screen = <SongWithoutChords chordName={chordName} songData={songData}/>;
-      }
-      else {
-        screen = <NameOfChord chordName={chordName} lesson_type={this.session.lesson_type}/>;
-      }
-      const button = this.state.done_playing ? (
-          <div className="row">
-            <div className="col-sm-8 offset-sm-2 text-center">
-              <br/>
-              <ContinueButton next={nextTrial} />
-            </div>
-          </div>) : null;
-
-      return (
-        <div className="container">
-          {screen}
-          {button}
-        </div>
-      );
+      const { lesson_type, chord_button_labels } = this.session;
+      return <LessonScreen chord={chord} lesson_type={lesson_type} chord_button_labels={chord_button_labels} next={nextTrial} show_next={this.state.done_playing}/>;
     }
     else {
       return <LoadingScreen />;
@@ -187,14 +168,14 @@ const InfoBeforeLessonPartA = props => {
   case LessonType.MUSICAL_PIECES:
     info = 
       <div>
-        <p>מיד תשמעו קטעים קצרים מתוך שירים ישראליים מוכרים. בכל קטע שתשמעו, האקורד הראשון יהיה האקורד המשמעותי, אליו עליכם להתייחס.</p>
+        <p>מיד תשמעו קטעים קצרים מתוך שירים מוכרים. בכל קטע שתשמעו, יושמעו אקורדים (מספר צלילים המנוגנים יחד) המלווים את השירה. האקורד הראשון יהיה האקורד המשמעותי, אליו עליכם להתייחס. אקורד זה יושמע בשנית לאחר הקטע.</p>
         <p>שימו לב כי הקטעים חוזרים על עצמם מספר רב של פעמים, בכדי לאפשר לכם למידה מעמיקה. נסו להאזין היטב בכל אחת מן ההשמעות.</p>
       </div>;
     break;
   case LessonType.TONAL_CONTEXT:
     info = 
       <div>
-        <p>מיד תשמעו צמדי אקורדים. לפני כל צמד אקורדים תשמעו מבוא טונאלי – סולם עולה ויורד. בכל צמד אקורדים שתשמעו, האקורד הראשון יהיה האקורד המשמעותי, אליו עליכם להתייחס.</p>
+        <p>מיד תשמעו צמדי אקורדים. לפני כל צמד אקורדים תשמעו סולם עולה ויורד (צלילים שמנוגנים בזה אחר זה, בניגוד לאקורדים עצמם, שבהם הצלילים מנוגנים יחד). לאחר מכן, בכל צמד אקורדים שתשמעו, האקורד הראשון יהיה האקורד המשמעותי, אליו עליכם להתייחס.</p>
         <p>שימו לב כי הקטעים חוזרים על עצמם מספר רב של פעמים, בכדי לאפשר לכם למידה מעמיקה. נסו להאזין היטב בכל אחת מן ההשמעות.</p>
       </div>;
     break;
@@ -225,7 +206,7 @@ const InfoBeforeLessonPartB = props => {
   case LessonType.TONAL_CONTEXT:
     info =
       <p>
-      מיד תשמעו אקורדים זהים לאקורדים ששמעתם, אך הפעם בביצוע של גיטרה. 
+      מיד תשמעו אקורדים זהים לאקורדים ששמעתם בחלק הקודם. 
       בכל קטע שתשמעו, האקורד הראשון יהיה האקורד המשמעותי, אליו עליכם להתייחס.
       שימו לב כי הקטעים חוזרים על עצמם מספר רב של פעמים, בכדי לאפשר לכם למידה מעמיקה. נסו להאזין היטב בכל אחת מן ההשמעות.
       </p>;
@@ -233,7 +214,8 @@ const InfoBeforeLessonPartB = props => {
   case LessonType.AUTOMATIC:
     info = 
       <p>
-      מיד תשמעו אקורדים זהים לאקורדים ששמעתם, אך הפעם בביצוע של גיטרה. שימו לב כי האקורדים חוזרים על עצמם מספר רב של פעמים, בכדי לאפשר לכם למידה מעמיקה. נסו להאזין היטב בכל אחת מן ההשמעות.
+      מיד תשמעו אקורדים זהים לאקורדים ששמעתם בחלק הקודם.
+      שימו לב כי האקורדים חוזרים על עצמם מספר רב של פעמים, בכדי לאפשר לכם למידה מעמיקה. נסו להאזין היטב בכל אחת מן ההשמעות.
       </p>;
     break;
   };
@@ -246,20 +228,24 @@ const InfoBeforeLessonPartC = props => {
   let info;
   switch (lesson_type) {
   case LessonType.MUSICAL_PIECES:
-    info = <p>בחלק זה תשמעו את האקורדים המלווים את השיר, ועליכם לשיר או לזמזם את המנגינה של השיר הכתוב.</p>;
+    info = <p>בחלק זה תשמעו את האקורדים המלווים את השיר בלבד, ללא המנגינה, ועליכם לשיר או לזמזם את המנגינה של השיר ששמו מופיע.</p>;
     break;
   case LessonType.TONAL_CONTEXT:
     info = <p>בחלק זה תשמעו את הסולם העולה והיורד ואחריו אקורד בודד.</p>;
     break;
   case LessonType.AUTOMATIC:
-    info = <p>בחלק זה תשמעו אקורדים בודדים משני הסוגים ששמעתם קודם לכן - בפסנתר ובגיטרה.</p>;
+    info = 
+      <p>
+      בחלק זה תשמעו אקורדים זהים לאקורדים ששמעתם בחלק הקודם.
+      שימו לב כי האקורדים חוזרים על עצמם מספר רב של פעמים, בכדי לאפשר לכם למידה מעמיקה. נסו להאזין היטב בכל אחת מן ההשמעות.
+      </p>;
     break;
   };
 
   return <InfoScreen info={info} next={next}/>;
 };
 
-// The main lesson block component.
+// The main lesson block component. Responsible mostly for the lesson sequence.
 export class LessonBlock extends React.Component {
   steps = {
     INFO_A: 1,

@@ -25,7 +25,7 @@
     border-radius: 100px;
     width: 200px;
     margin: auto;
-    margin-top: 245px;
+    margin-top: 250px;
     position: fixed;
     top: 0;
     right: 0;
@@ -35,7 +35,7 @@
 }
 
 .center-trial-btn .btn-secondary {
-    font-size: 2em;
+    font-size: 1.5em;
     margin-top: 40px;
 }
 

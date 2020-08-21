@@ -8,19 +8,6 @@
   maring-right: 0;
 }
 
-@media (min-width: 992px) {
-    .songImage {
-        padding-right: 15%;
-    }
-}
-
-.songImage{
-    float: right;
-    position: absolute;
-    white-space: nowrap;
-    overflow-x: auto;
-}
-
 .songTitle{
   font-size: 40px;
   overflow: hidden;
@@ -31,8 +18,9 @@
 }
 
 .chordName{
-  font-size: 40px;
+  font-size: 36px;
   font-weight: bold;
+  margin-bottom: 0;
 }
 
 .clearBoth{
@@ -75,4 +63,55 @@
 .infotext p {
   margin-top: 2%;
   margin-bottom: 0.5em;
+}
+
+.center-lesson-btn {
+    text-align: center;
+    height: 150px;/*height needs to be set*/
+    border-radius: 100px;
+    width: 200px;
+    margin: auto;
+    margin-top: 295px;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: white;
+}
+
+.center-lesson-btn .btn-secondary {
+    font-size: 1.5em;
+    margin-top: 40px;
+}
+
+
+.center-chord-text {
+    text-align: center;
+    height: 200px;
+    width: 1000px;
+    margin: auto;
+    margin-top: 0px;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+.center-chord-image {
+    text-align: center;
+    height: 142px;
+    width: 170px;
+    margin: auto;
+    margin-top: 545px;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+.lesson-button-table .chordSelection {
+    margin-top: 0;
 }
