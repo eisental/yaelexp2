@@ -348,13 +348,14 @@ class TrainingExperiment extends React.Component {
     const { step } = this.state;
     let new_step = step + 1;
 
-    if (this.state.session && this.state.session.number && this.state.session.number !== 1) {
-      if (step + 1 === this.steps.PRETEST_INFO || step + 1 === this.steps.PRETEST)
+    if (this.state.session && this.state.session.number) {
+      if (this.state.session.number !== 1 && 
+          (step + 1 === this.steps.PRETEST_INFO || step + 1 === this.steps.PRETEST))
         // jump over pretest after the 1st session.
         new_step = this.steps.PRETEST + 1;
       else if (step + 1 === this.steps.ASSOCIATION_FORM && 
-               (this.state.session.lesson_type !== LessonType.AUTOMATIC ||
-                (this.state.session.number !== 1 && this.state.session.number !== MAX_NUMBER_OF_SESSIONS)))
+               !(this.state.session.lesson_type === LessonType.AUTOMATIC &&
+                 (this.state.session.number === 1 || this.state.session.number === MAX_NUMBER_OF_SESSIONS)))
         // jump over association form unless this is the 1st or last session of automatic lesson type.
         new_step = this.steps.ASSOCIATION_FORM + 1;
     }

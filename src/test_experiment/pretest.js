@@ -8,7 +8,7 @@ const PretestTrial = ({button_labels, next, trial_idx, trial_chord}) => {
     <div className="container">
       <div className="overlay-box"><p>{trial_chord}</p></div>
       <div className="row">
-        <ButtonTable labels={button_labels} values={button_labels} next={next} key={trial_idx} />
+        <ButtonTable labels={button_labels} values={button_labels} next={next} key={trial_idx} hide_fixation={true}/>
       </div>
     </div>    
 

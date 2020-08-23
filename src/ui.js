@@ -57,7 +57,7 @@ export const ReplayButton = ({onClick, disabled}) => {
 
 /* 4 buttons in a square layout with fixation point in the middle. Each button is assigned a value to be passed to 
    the next function when it's clicked. */
-export const ButtonTable = ({labels, values, disabled, next, highlight, no_interaction}) => {
+export const ButtonTable = ({labels, values, disabled, next, highlight, no_interaction, hide_fixation}) => {
   const gen_button = (btn_idx) => {
     const className="chordBtn" + (no_interaction ? " no_interaction" : "")
       + (highlight===btn_idx ? " highlight" : "");
@@ -70,6 +70,8 @@ export const ButtonTable = ({labels, values, disabled, next, highlight, no_inter
       return <button className={className} onClick={onClick}>{labels[btn_idx]}</button>;
   };
 
+  let plusClass = "plusSign align-middle" + (hide_fixation ? " hidden" : "");
+
   return (
     <table className="chordSelection">
       <tbody>
@@ -80,7 +82,7 @@ export const ButtonTable = ({labels, values, disabled, next, highlight, no_inter
         </tr>
         <tr>
           <td></td>
-          <td className="plusSign align-middle">+</td>
+          <td className={plusClass}>+</td>
           <td></td>
         </tr>
         <tr>

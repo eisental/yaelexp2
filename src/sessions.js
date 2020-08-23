@@ -75,7 +75,6 @@ export const read_subject_data = (conn, id) => {
     .then(response => response.json())
     .then(data => {
       for (const row of data.values) {
-        console.log(row[0]);
         if (row[0] === id) {
           return {
             lesson_type: row[1],

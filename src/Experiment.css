@@ -52,4 +52,10 @@
   font-size: 120px;
   font-weight: 100;
   padding: 50px 100px 50px 100px;
+  position: relative;
+  bottom: 15px;
+}
+
+.hidden {
+    visibility: hidden;
 }
