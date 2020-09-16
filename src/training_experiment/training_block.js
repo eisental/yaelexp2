@@ -1,6 +1,6 @@
 import React from 'react';
 import { AudioController } from '../audio_controller.js';
-import { LessonType, Strings, StaticImages, Chords, musical_pieces_data } from '../defs.js';
+import { LessonType, LessonTypeNumbering, Strings, StaticImages, Chords, musical_pieces_data } from '../defs.js';
 import { ReplayButton, LoadingScreen, ContinueButton, ButtonTable } from '../ui.js';
 import { randomSequence } from '../randomize.js';
 import { TrainingInfo, InfoBeforeTrainingPartB, InfoBeforeTrainingPartC } from './info.js';
@@ -349,6 +349,9 @@ class TrainingPart extends React.Component {
     // save trial data
     const td = {
       time: new Date().toString(),
+      strategy: LessonTypeNumbering[this.session.lesson_type],
+      part: this.part + 1,
+      is_free: this.is_free ? 1 : 2,
       audio_index: trial_data[0],
       chord_number: this.trials_per_part * this.part + this.state.trial_idx + 1,
       chord_type: chord_name,

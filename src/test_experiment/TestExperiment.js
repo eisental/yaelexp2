@@ -2,7 +2,7 @@ import React from 'react';
 import '../Experiment.css';
 import './TestExperiment.css';
 import { InfoScreen, ContinueButton, ErrorScreen, LoadingScreen } from '../ui.js';
-import { LessonType, Chords } from '../defs.js';
+import { LessonType, LessonTypeNumbering, Chords } from '../defs.js';
 import { PretestBlock } from './pretest.js';
 import { SubtestsBlock } from './subtests.js';
 import { PersonalInfoScreen } from './personal_info.js';
@@ -172,6 +172,7 @@ class TestExperiment extends React.Component {
         t.id = this.data.id;
         t.start_time = this.data.start_time;
         t.end_time = this.data.end_time;
+        t.strategy = LessonTypeNumbering[this.lesson_type];
       });
       
       const that = this;

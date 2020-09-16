@@ -17,14 +17,7 @@ export class PersonalInfoScreen extends React.Component {
       return;
     }
 
-    const genderMaleChecked = document.getElementById('male').checked;
-    const genderFemaleChecked = document.getElementById('female').checked;
-    if (!genderMaleChecked && !genderFemaleChecked) {
-      alert("אנא בחרו מין.");
-      return;
-    }
-    const gender = genderMaleChecked ? 2 : 1;
-
+    const gender = document.getElementById('gender').value;
     const musical_background = document.getElementById('musical_background').value;
     const residence = document.getElementById('residence').value;
     const education = document.getElementById('education').value;
@@ -41,7 +34,8 @@ export class PersonalInfoScreen extends React.Component {
         small_min_recognition.length===0 || half_dim_recognition.length===0 ||
         hwcomputer.length===0 || hwdisplay.length===0 || 
         hwmouse.length===0 || hwheadphones.length===0 ||
-        education==="-" || residence==="-" || musical_background==="-") {
+        education==="-" || residence==="-" || musical_background==="-" ||
+        gender==="-") {
       alert("אנא ענו על כל השאלות.");
       return;
     }
@@ -148,10 +142,12 @@ export class PersonalInfoScreen extends React.Component {
             <input type="text" id="age" name="age" maxLength="2"/>
             <br/>
             <label htmlFor="gender">מין:</label>
-            <label htmlFor="male">זכר</label>
-            <input type="radio" id="male" name="gender" value="male"/>
-            <label htmlFor="female">נקבה</label>
-            <input type="radio" id="female" name="gender" value="female"/>
+            <select id="gender" name="gender" defaultValue="-">
+              <option hidden disabled value="-"></option>
+              <option value="1">נקבה</option>
+              <option value="2">זכר</option>
+              <option value="3">אחר</option>
+            </select>
             <br/>
             <label htmlFor="musical_background">רקע מוזיקלי מוקדם:</label>
             <select id="musical_background" name="musical_background" defaultValue="-">

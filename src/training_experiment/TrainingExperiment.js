@@ -64,18 +64,18 @@ const AssociationForm = ({data, session, next}) => {
     const chord_associations = document.getElementById('chord_associations').value;
 
     if (chord_associations.length===0) {
-      alert("אנא ענו על השאלה.");
-      return;
+      next();
     }
-
-    const td = {
-      time: new Date().toString(),
-      session_number: session.number,
-      chord_associations: chord_associations
-    };
-    data.trials.push(td);
-    ls.set("data", data);
-    next();
+    else {
+      const td = {
+        time: new Date().toString(),
+        session_number: session.number,
+        chord_associations: chord_associations
+      };
+      data.trials.push(td);
+      ls.set("data", data);
+      next();
+    }
   };
 
   return (
