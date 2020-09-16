@@ -1,16 +1,20 @@
-let audioIdx2File = (idx) => "/audio/" + idx + ".mp3";
+let audioIdx2File = (idx) => "audio/" + idx + ".mp3";
 
 export class AudioController {
   constructor(srcs, onDoneLoading, onAudioEnded) {
-    this.srcs = srcs;
     this.players = [];
     this.ids2players = {};
     this.players2ids = {};
-    for (const id of this.srcs) {
+    for (const id of srcs) {
       const playerIdx = this.players.length;
+
+      if (id in this.ids2players) {
+        continue;
+      }
+
       this.ids2players[id] = playerIdx;
       this.players2ids[playerIdx] = id;
-      console.log("adding:" + id + " to player " + this.players.length);
+
       const p = new Audio(audioIdx2File(id));
       p.addEventListener('canplaythrough', (e => {this.audioLoaded(p)}), false);
       p.addEventListener('ended', (e => {
@@ -20,13 +24,13 @@ export class AudioController {
       this.players.push(p);
     }
 
+    console.log("Loading " + this.players.length + " audio files");
     this.loadCount = 0;
     this.onDoneLoading = onDoneLoading;
     this.onAudioEnded = onAudioEnded;
   }
 
   audioLoaded(player) {
-    console.log("loaded audio:" + player.src);
     this.loadCount+=1;
     if (this.loadCount === this.players.length) {
       if (this.onDoneLoading) this.onDoneLoading();
@@ -35,7 +39,15 @@ export class AudioController {
 
   play(audio_id) {
     const playerIdx = this.ids2players[audio_id];
-    console.log("playing " + audio_id + " on player " + playerIdx);
-    this.players[playerIdx].play();
+    this.players[playerIdx].play()
+      .catch(err => {
+        console.log("Error while playing audio file.");
+      });
+  }
+
+  stop(audio_id) {
+    const playerIdx = this.ids2players[audio_id];
+    this.players[playerIdx].pause();
+    this.players[playerIdx].currentTime = 0;
   }
 }

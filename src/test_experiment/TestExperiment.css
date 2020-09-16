@@ -1,0 +1,60 @@
+.finish-screen h1 {
+    font-family: sans-serif;
+    font-size: 4em;
+}
+
+.overlay-box {
+    background-color: lightgrey;
+    border: 1px solid #000;
+    text-align:center;
+    height: 150px;/*height needs to be set*/
+    border-radius: 100px;
+    width: 200px;
+    margin: auto;
+    margin-top: 235px;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+.center-trial-btn {
+    text-align:center;
+    height: 150px;/*height needs to be set*/
+    border-radius: 100px;
+    width: 200px;
+    margin: auto;
+    margin-top: 250px;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: white;
+}
+
+.center-trial-btn .btn-secondary {
+    font-size: 1.5em;
+    margin-top: 32px;
+}
+
+.center-trial-btn .btn-replay {
+    margin-top: 5px;
+}
+
+.overlay-box p {
+    margin-top: 60px;
+}
+
+.personal-info-form label {
+    margin-left: 0.5em;    
+}
+
+.personal-info-form input {
+    margin-left: 0.5em;
+}
+
+.songs_form select {
+    min-width: 4em;
+}

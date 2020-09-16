@@ -1,0 +1,61 @@
+.chordSelection {
+    margin-top: 5%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.chordBtn{
+  background-color:  #e7e7e7;; 
+  border: 1px black solid;
+  color: black;
+  width: 170px;
+  height: 110px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 20px;
+  border-radius: 5px;
+}
+
+.chordBtn:disabled {
+  color: darkgray;
+}
+
+.chordBtn:active {
+    background-color: darkgray;
+}
+
+.chordBtn.no_interaction:active {
+    background-color:  #e7e7e7;;
+}
+
+.chordBtn.highlight {
+    background-color: cyan;
+}
+
+.chordBtn.highlight.animate {
+    animation: highlightAnimation 2s infinite;
+    animation-timing-function: ease-in-out;
+    border-width: 3px;
+}
+@keyframes highlightAnimation {
+	0%	  { background-color: #e7e7e7;}
+	50%  { background-color: #878787;}
+}
+
+.chordBtn p {
+    margin-bottom: 0;
+}
+
+.plusSign{
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
+  font-size: 120px;
+  font-weight: 100;
+  padding: 50px 100px 50px 100px;
+  position: relative;
+  bottom: 15px;
+}
+
+.hidden {
+    visibility: hidden;
+}
