@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/yaelexp2/static/css/main.53f64adf.chunk.css",
-    "main.js": "/yaelexp2/static/js/main.647da616.chunk.js",
-    "main.js.map": "/yaelexp2/static/js/main.647da616.chunk.js.map",
+    "main.js": "/yaelexp2/static/js/main.506419b7.chunk.js",
+    "main.js.map": "/yaelexp2/static/js/main.506419b7.chunk.js.map",
     "runtime-main.js": "/yaelexp2/static/js/runtime-main.528fb7db.js",
     "runtime-main.js.map": "/yaelexp2/static/js/runtime-main.528fb7db.js.map",
     "static/js/2.6fb6fe29.chunk.js": "/yaelexp2/static/js/2.6fb6fe29.chunk.js",
     "static/js/2.6fb6fe29.chunk.js.map": "/yaelexp2/static/js/2.6fb6fe29.chunk.js.map",
     "index.html": "/yaelexp2/index.html",
-    "precache-manifest.73baed6951f40381ef60511010cef724.js": "/yaelexp2/precache-manifest.73baed6951f40381ef60511010cef724.js",
+    "precache-manifest.2febe2b6dffff5cf4fd68c8096eaf869.js": "/yaelexp2/precache-manifest.2febe2b6dffff5cf4fd68c8096eaf869.js",
     "service-worker.js": "/yaelexp2/service-worker.js",
     "static/css/main.53f64adf.chunk.css.map": "/yaelexp2/static/css/main.53f64adf.chunk.css.map",
     "static/js/2.6fb6fe29.chunk.js.LICENSE": "/yaelexp2/static/js/2.6fb6fe29.chunk.js.LICENSE"
@@ -17,6 +17,6 @@
     "static/js/runtime-main.528fb7db.js",
     "static/js/2.6fb6fe29.chunk.js",
     "static/css/main.53f64adf.chunk.css",
-    "static/js/main.647da616.chunk.js"
+    "static/js/main.506419b7.chunk.js"
   ]
 }
